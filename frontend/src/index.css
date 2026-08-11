@@ -1,0 +1,127 @@
+:root {
+  --bg: #0f172a;
+  --bg-card: #1e293b;
+  --fg: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #10b981;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --radius: 10px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body, html { margin: 0; padding: 0; background: var(--bg); color: var(--fg); min-height: 100vh; }
+a { color: var(--accent); text-decoration: none; }
+
+.page { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+.topbar h1 { margin: 0; font-size: 1.5rem; }
+
+.user-info { display: flex; align-items: center; gap: 0.75rem; }
+.user-info small { color: var(--muted); }
+
+button, .link-btn {
+  background: var(--accent);
+  color: #0f172a;
+  border: 0;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+}
+button:disabled, .link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--bg-card);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  display: block;
+  color: inherit;
+}
+.card:hover { outline: 2px solid var(--accent); }
+.card h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+.card .meta {
+  display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;
+  font-size: 0.85rem; color: var(--muted);
+}
+.hint { color: var(--muted); font-size: 0.85rem; margin-top: 0.75rem; }
+.muted { color: var(--muted); }
+.error { color: var(--danger); }
+.success { color: var(--accent); }
+
+.auth-page {
+  display: grid; place-items: center; min-height: 100vh; padding: 2rem;
+}
+.auth-card {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: var(--radius);
+  width: 100%; max-width: 380px;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.auth-card h1 { margin: 0; text-align: center; }
+.auth-card label { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.9rem; color: var(--muted); }
+.auth-card input {
+  background: var(--bg); color: var(--fg); border: 1px solid #334155;
+  padding: 0.6rem 0.8rem; border-radius: var(--radius); font-size: 1rem;
+}
+
+.filters { display: flex; gap: 1rem; align-items: end; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.filters label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--muted); }
+.filters input, .filters select {
+  background: var(--bg-card); color: var(--fg); border: 1px solid #334155;
+  padding: 0.5rem 0.7rem; border-radius: var(--radius);
+}
+
+.slot-group { margin-bottom: 1.5rem; }
+.slot-group h3 { margin: 0 0 0.5rem; color: var(--muted); font-size: 1rem; }
+.slot-grid { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.slot {
+  background: var(--bg-card); color: var(--fg); border: 1px solid #334155;
+  padding: 0.5rem 0.85rem; border-radius: var(--radius); font-weight: 500;
+}
+.slot:hover:not(:disabled) { background: var(--accent); color: #0f172a; }
+
+.booking-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.booking {
+  background: var(--bg-card); padding: 1rem; border-radius: var(--radius);
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+}
+.booking-cancelled { opacity: 0.6; }
+
+.badge {
+  display: inline-block; padding: 0.2rem 0.5rem; border-radius: 999px;
+  font-size: 0.75rem; font-weight: 600; background: #334155; color: var(--fg);
+  margin-right: 0.4rem;
+}
+.badge-confirmed { background: #065f46; }
+.badge-pending { background: var(--warn); color: #0f172a; }
+.badge-cancelled { background: var(--danger); }
+.badge-completed { background: #475569; }
+.badge-no_show { background: #475569; }
+
+.toasts { position: fixed; right: 1rem; bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; max-width: 340px; }
+.toast {
+  background: var(--bg-card); border-left: 4px solid var(--accent);
+  padding: 0.75rem 1rem; border-radius: var(--radius); box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.toast-cancelled { border-color: var(--danger); }
+.toast-confirmed { border-color: var(--accent); }
+.toast-created { border-color: var(--warn); }
+.toast p { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--muted); }
+
+.center { text-align: center; padding: 3rem; }
