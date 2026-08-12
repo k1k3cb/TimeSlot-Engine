@@ -191,11 +191,14 @@ export class BookingsService {
     });
   }
 
-  async complete(id: string): Promise<Booking> {
+  async markAttendance(id: string): Promise<Booking> {
     const booking = await this.prisma.booking.findUnique({ where: { id } });
     if (!booking) throw new NotFoundException(`Booking ${id} not found`);
     if (booking.status === 'CANCELLED' || booking.status === 'NO_SHOW') {
-      throw new BadRequestException(`Cannot complete booking in state ${booking.status}`);
+      throw new BadRequestException(`Cannot mark attendance for booking in state ${booking.status}`);
+    }
+    if (booking.status === 'COMPLETED') {
+      throw new BadRequestException('Attendance already confirmed');
     }
     return this.prisma.booking.update({
       where: { id },

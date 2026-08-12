@@ -121,14 +121,14 @@ export class BookingsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
-  @Patch(':id/complete')
+  @Patch(':id/attend')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Marcar reserva como completada (ADMIN)' })
-  @ApiResponse({ status: 200, description: 'Reserva completada', type: BookingResponseDto })
-  @ApiResponse({ status: 400, description: 'Estado inválido para completar', type: ErrorResponseDto })
+  @ApiOperation({ summary: 'Confirmar asistencia (ADMIN)', description: 'Marca la reserva como COMPLETED cuando el usuario se presenta a jugar.' })
+  @ApiResponse({ status: 200, description: 'Asistencia confirmada', type: BookingResponseDto })
+  @ApiResponse({ status: 400, description: 'Estado inválido o asistencia ya confirmada', type: ErrorResponseDto })
   @ApiResponse({ status: 404, description: 'Reserva no encontrada', type: ErrorResponseDto })
-  complete(@Param('id', ParseCuidPipe) id: string) {
-    return this.bookings.complete(id);
+  markAttendance(@Param('id', ParseCuidPipe) id: string) {
+    return this.bookings.markAttendance(id);
   }
 
   @ApiBearerAuth()

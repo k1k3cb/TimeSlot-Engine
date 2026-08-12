@@ -68,8 +68,8 @@ export const bookingsApi = {
     api.patch<Booking>(`/bookings/${id}/cancel`, { reason }).then((r) => r.data),
   confirm: (id: string) =>
     api.patch<Booking>(`/bookings/${id}/confirm`).then((r) => r.data),
-  complete: (id: string) =>
-    api.patch<Booking>(`/bookings/${id}/complete`).then((r) => r.data),
+  attend: (id: string) =>
+    api.patch<Booking>(`/bookings/${id}/attend`).then((r) => r.data),
   markNoShow: (id: string) =>
     api.patch<Booking>(`/bookings/${id}/no-show`).then((r) => r.data),
 };

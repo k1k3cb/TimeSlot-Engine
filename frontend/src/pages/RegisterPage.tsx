@@ -39,8 +39,8 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="auth-page">
-      <form onSubmit={handleSubmit} className="auth-card">
+    <div className="register-page">
+      <form onSubmit={handleSubmit} className="register-card">
         <h1>Crear cuenta</h1>
         <p className="muted">Regístrate para reservar canchas</p>
 
@@ -95,7 +95,7 @@ export function RegisterPage() {
           {loading ? 'Creando cuenta...' : 'Registrarse'}
         </button>
 
-        <p className="hint">
+        <p className="hint" style={{ textAlign: 'center', marginTop: '1rem' }}>
           ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
         </p>
       </form>
