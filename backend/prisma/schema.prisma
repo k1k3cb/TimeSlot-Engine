@@ -1,0 +1,110 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [btree_gist]
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum BookingMode {
+  EXCLUSIVE
+  SHARED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  passwordHash String
+  name         String
+  role         Role           @default(CLIENT)
+  isActive     Boolean        @default(true)
+  bookings     Booking[]
+  refreshTokens RefreshToken[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Resource {
+  id          String              @id @default(cuid())
+  name        String
+  description String?
+  mode        BookingMode         @default(EXCLUSIVE)
+  capacity    Int                 @default(1)
+  timezone    String              @default("UTC")
+  isActive    Boolean             @default(true)
+  schedules   ResourceSchedule[]
+  bookings    Booking[]
+  policy      CancellationPolicy?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([isActive])
+}
+
+model ResourceSchedule {
+  id         String   @id @default(cuid())
+  resourceId String
+  dayOfWeek  Int
+  openTime   String
+  closeTime  String
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([resourceId, dayOfWeek])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  resourceId  String
+  userId      String
+  startAt     DateTime      @db.Timestamptz(3)
+  endAt       DateTime      @db.Timestamptz(3)
+  status      BookingStatus @default(PENDING)
+  notes       String?
+  cancelledAt DateTime?     @db.Timestamptz(3)
+  refundPct   Int?
+  resource    Resource      @relation(fields: [resourceId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime      @updatedAt @db.Timestamptz(3)
+
+  @@index([resourceId, startAt, endAt])
+  @@index([userId, startAt])
+  @@index([status])
+}
+
+model CancellationPolicy {
+  id         String    @id @default(cuid())
+  resourceId String?   @unique
+  rules      Json
+  resource   Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+}
