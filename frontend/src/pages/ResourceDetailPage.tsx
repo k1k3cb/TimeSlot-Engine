@@ -13,7 +13,9 @@ export function ResourceDetailPage() {
   const queryClient = useQueryClient();
 
   const initialResource = (location.state as { resource?: Resource } | null)?.resource;
-  const [date, setDate] = useState(DateTime.now().plus({ days: 1 }).toISODate()!);
+  const today = DateTime.now().toISODate()!;
+  const tomorrow = DateTime.now().plus({ days: 1 }).toISODate()!;
+  const [date, setDate] = useState(tomorrow);
   const [duration, setDuration] = useState(60);
 
   const resourceQuery = useQuery({
@@ -75,7 +77,7 @@ export function ResourceDetailPage() {
       <section className="filters">
         <label>
           Fecha
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <input type="date" value={date} min={today} onChange={(e) => setDate(e.target.value)} />
         </label>
         <label>
           Duración

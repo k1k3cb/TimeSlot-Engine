@@ -32,9 +32,9 @@ export class BookingsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('CLIENT', 'ADMIN')
   @Post()
-  @ApiOperation({ summary: 'Crear reserva', description: 'Reserva un slot de tiempo en una cancha. Valida disponibilidad en tiempo real y previene solapamientos via constraint EXCLUDE en PostgreSQL.' })
+  @ApiOperation({ summary: 'Crear reserva', description: 'Reserva un slot de tiempo en una cancha. Valida disponibilidad en tiempo real, previene solapamientos via constraint EXCLUDE en PostgreSQL, y rechaza fechas pasadas.' })
   @ApiResponse({ status: 201, description: 'Reserva creada y confirmada', type: BookingResponseDto })
-  @ApiResponse({ status: 400, description: 'Datos inválidos o slot fuera de horario', type: ErrorResponseDto })
+  @ApiResponse({ status: 400, description: 'Datos inválidos, slot fuera de horario, o fecha pasada', type: ErrorResponseDto })
   @ApiResponse({ status: 401, description: 'No autorizado', type: ErrorResponseDto })
   @ApiResponse({ status: 409, description: 'Slot ya reservado (solapamiento)', type: ErrorResponseDto })
   create(@Body() dto: CreateBookingDto, @CurrentUser() user: RequestUser) {

@@ -90,7 +90,7 @@ export function AdminBookingsPage() {
           <tbody>
             {data?.map((b) => {
               const tz = b.resource.timezone || 'UTC';
-              const start = DateTime.fromISO(b.startAt).setZone(tz);
+              const start = DateTime.fromISO(b.startAt).setZone(tz).setLocale('es');
               const end = DateTime.fromISO(b.endAt).setZone(tz);
               return (
                 <tr key={b.id}>
@@ -105,7 +105,7 @@ export function AdminBookingsPage() {
                       <span className="muted">{b.userId}</span>
                     )}
                   </td>
-                  <td>{start.toFormat('dd LLL yyyy')}</td>
+                  <td>{start.toFormat("d 'de' MMMM yyyy")}</td>
                   <td>{start.toFormat('HH:mm')} – {end.toFormat('HH:mm')}</td>
                   <td>
                     <span className={`badge badge-${b.status.toLowerCase()}`}>{b.status}</span>

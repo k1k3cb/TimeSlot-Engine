@@ -3,12 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router-dom';
 import { resourcesApi } from '../api/endpoints';
-import { useAuth } from '../context/AuthContext';
 import { useBookingNotifications } from '../hooks/useBookingNotifications';
+import { ClientNav } from '../components/ClientNav';
 import type { BookingEvent } from '../types/domain';
 
 export function ResourcesPage() {
-  const { user, logout } = useAuth();
   const [toasts, setToasts] = useState<BookingEvent[]>([]);
 
   const { data, isLoading, error } = useQuery({
@@ -26,45 +25,55 @@ export function ResourcesPage() {
   const today = useMemo(() => DateTime.now().toISODate(), []);
 
   return (
-    <div className="page">
-      <header className="topbar">
-        <h1>Canchas</h1>
-        <div className="user-info">
-          {user?.role === 'ADMIN' && (
-            <Link to="/admin" className="link-btn">Admin</Link>
-          )}
-          <Link to="/bookings" className="link-btn">Mis reservas</Link>
-          <span>
-            {user?.name} <small>({user?.role})</small>
-          </span>
-          <button onClick={logout}>Salir</button>
-        </div>
-      </header>
+    <div className="client-page">
+      <ClientNav />
 
-      <main>
-        {isLoading && <p>Cargando...</p>}
-        {error && <p className="error">Error al cargar canchas</p>}
-        {data && data.length === 0 && <p>No hay canchas disponibles.</p>}
+      <main className="client-main">
+        <div className="client-content">
+          <div className="client-hero">
+            <h1>Reserva tu cancha</h1>
+            <p>Selecciona una cancha para ver disponibilidad y reservar</p>
+          </div>
 
-        <div className="grid">
-          {data?.map((r) => (
-            <Link
-              key={r.id}
-              to={`/resources/${r.id}`}
-              className="card"
-              state={{ resource: r }}
-            >
-              <h2>{r.name}</h2>
-              <p className="muted">{r.description}</p>
-              <div className="meta">
-                <span>Zona horaria: {r.timezone}</span>
-                <span>Modo: {r.mode}</span>
-                <span>Capacidad: {r.capacity}</span>
-              </div>
-              <p className="hint">Ver disponibilidad →</p>
-              <p className="hint">Fecha actual: {today}</p>
-            </Link>
-          ))}
+          {isLoading && <p className="center">Cargando...</p>}
+          {error && <p className="error center">Error al cargar canchas</p>}
+          {data && data.length === 0 && <p className="center muted">No hay canchas disponibles.</p>}
+
+          <div className="grid">
+            {data?.map((r) => (
+              <Link
+                key={r.id}
+                to={`/resources/${r.id}`}
+                className="card"
+                state={{ resource: r }}
+              >
+                <div className="card-header">
+                  <h2>{r.name}</h2>
+                  <span className={`badge ${r.isActive ? 'badge-confirmed' : 'badge-cancelled'}`}>
+                    {r.isActive ? 'Activa' : 'Inactiva'}
+                  </span>
+                </div>
+                <p className="muted">{r.description}</p>
+                <div className="meta">
+                  <span className="meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    {r.timezone.split('/').pop()?.replace(/_/g, ' ') ?? r.timezone}
+                  </span>
+                  <span className="meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                    </svg>
+                    {r.mode === 'EXCLUSIVE' ? 'Exclusivo' : `Compartido (${r.capacity})`}
+                  </span>
+                </div>
+                <p className="hint">Ver disponibilidad →</p>
+              </Link>
+            ))}
+          </div>
         </div>
       </main>
 

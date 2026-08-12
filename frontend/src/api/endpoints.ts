@@ -19,15 +19,35 @@ export const authApi = {
   me: () => api.get('/auth/me').then((r) => r.data),
 };
 
+export interface CreateResourcePayload {
+  name: string;
+  description?: string;
+  mode?: 'EXCLUSIVE' | 'SHARED';
+  capacity?: number;
+  timezone?: string;
+  isActive?: boolean;
+  schedules: { dayOfWeek: number; openTime: string; closeTime: string }[];
+}
+
+export interface UpdateResourcePayload {
+  name?: string;
+  description?: string;
+  mode?: 'EXCLUSIVE' | 'SHARED';
+  capacity?: number;
+  timezone?: string;
+  isActive?: boolean;
+  schedules?: { dayOfWeek: number; openTime: string; closeTime: string }[];
+}
+
 export const resourcesApi = {
   list: (params?: { onlyActive?: boolean }) =>
     api.get<Resource[]>('/resources', { params }).then((r) => r.data),
   listAll: () =>
     api.get<Resource[]>('/resources', { params: { onlyActive: false } }).then((r) => r.data),
   get: (id: string) => api.get<Resource>(`/resources/${id}`).then((r) => r.data),
-  create: (payload: Omit<Partial<Resource>, 'schedules'> & { schedules: unknown[] }) =>
+  create: (payload: CreateResourcePayload) =>
     api.post<Resource>('/resources', payload).then((r) => r.data),
-  update: (id: string, payload: Omit<Partial<Resource>, 'schedules'> & { schedules?: unknown[] }) =>
+  update: (id: string, payload: UpdateResourcePayload) =>
     api.patch<Resource>(`/resources/${id}`, payload).then((r) => r.data),
   delete: (id: string) => api.delete(`/resources/${id}`),
 };

@@ -50,6 +50,11 @@ export class BookingsService {
       throw new BadRequestException('endAt must be after startAt');
     }
 
+    const now = new Date();
+    if (startAt < now) {
+      throw new BadRequestException('Cannot book in the past');
+    }
+
     const resource = await this.prisma.resource.findUnique({
       where: { id: input.resourceId },
       include: { schedules: true },

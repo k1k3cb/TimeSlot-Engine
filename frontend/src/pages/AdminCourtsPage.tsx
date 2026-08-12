@@ -1,19 +1,69 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { resourcesApi } from '../api/endpoints';
+import { resourcesApi, type CreateResourcePayload } from '../api/endpoints';
 import type { Resource, ResourceSchedule, BookingMode } from '../types/domain';
 
 const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-const TIMEZONES = [
-  'Europe/Madrid',
-  'Europe/Barcelona',
-  'Europe/Berlin',
-  'Europe/Paris',
-  'Europe/Rome',
-  'Europe/London',
-  'Europe/Lisbon',
-  'UTC',
-];
+
+const TIMEZONES_BY_REGION: Record<string, string[]> = {
+  'Europa': [
+    'Europe/Madrid',
+    'Europe/Barcelona',
+    'Europe/Berlin',
+    'Europe/Paris',
+    'Europe/Rome',
+    'Europe/London',
+    'Europe/Lisbon',
+    'Europe/Amsterdam',
+    'Europe/Brussels',
+    'Europe/Vienna',
+    'Europe/Zurich',
+    'Europe/Stockholm',
+    'Europe/Oslo',
+    'Europe/Copenhagen',
+    'Europe/Helsinki',
+    'Europe/Warsaw',
+    'Europe/Prague',
+    'Europe/Bucharest',
+    'Europe/Athens',
+    'Europe/Istanbul',
+    'Europe/Moscow',
+  ],
+  'América': [
+    'America/New_York',
+    'America/Chicago',
+    'America/Denver',
+    'America/Los_Angeles',
+    'America/Mexico_City',
+    'America/Bogota',
+    'America/Lima',
+    'America/Santiago',
+    'America/Buenos_Aires',
+    'America/Montevideo',
+    'America/Sao_Paulo',
+    'America/Toronto',
+    'America/Vancouver',
+  ],
+  'Asia-Pacífico': [
+    'Asia/Tokyo',
+    'Asia/Shanghai',
+    'Asia/Singapore',
+    'Asia/Dubai',
+    'Asia/Kolkata',
+    'Australia/Sydney',
+    'Australia/Melbourne',
+    'Pacific/Auckland',
+  ],
+  'UTC': ['UTC'],
+};
+
+function extractError(err: unknown): string {
+  const axios = err as { response?: { data?: { message?: string | string[] } } };
+  const msg = axios.response?.data?.message;
+  if (Array.isArray(msg)) return msg.join('. ');
+  if (typeof msg === 'string') return msg;
+  return (err as Error).message || 'Error desconocido';
+}
 
 interface ScheduleRow {
   dayOfWeek: number;
@@ -66,7 +116,7 @@ const EMPTY_FORM: CourtForm = {
   description: '',
   mode: 'EXCLUSIVE',
   capacity: 1,
-  timezone: 'America/Mexico_City',
+  timezone: 'Europe/Madrid',
   isActive: true,
   schedules: emptySchedule(),
 };
@@ -83,47 +133,42 @@ export function AdminCourtsPage() {
     queryFn: () => resourcesApi.listAll(),
   });
 
+  function buildPayload(): CreateResourcePayload {
+    const schedules = toSchedules(form.schedules);
+    if (schedules.length === 0) throw new Error('Selecciona al menos un día');
+    const payload: CreateResourcePayload = {
+      name: form.name.trim(),
+      mode: form.mode,
+      capacity: form.capacity,
+      timezone: form.timezone,
+      isActive: form.isActive,
+      schedules,
+    };
+    if (form.description.trim()) {
+      payload.description = form.description.trim();
+    }
+    return payload;
+  }
+
   const createMut = useMutation({
-    mutationFn: () => {
-      const schedules = toSchedules(form.schedules);
-      if (schedules.length === 0) throw new Error('Selecciona al menos un día');
-      return resourcesApi.create({
-        name: form.name,
-        description: form.description || undefined,
-        mode: form.mode,
-        capacity: form.capacity,
-        timezone: form.timezone,
-        isActive: form.isActive,
-        schedules,
-      });
-    },
+    mutationFn: () => resourcesApi.create(buildPayload()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-resources'] });
       closeForm();
     },
-    onError: (e) => setError((e as Error).message),
+    onError: (e) => setError(extractError(e)),
   });
 
   const updateMut = useMutation({
     mutationFn: () => {
       if (!editing) throw new Error('No editing');
-      const schedules = toSchedules(form.schedules);
-      if (schedules.length === 0) throw new Error('Selecciona al menos un día');
-      return resourcesApi.update(editing, {
-        name: form.name,
-        description: form.description || undefined,
-        mode: form.mode,
-        capacity: form.capacity,
-        timezone: form.timezone,
-        isActive: form.isActive,
-        schedules,
-      });
+      return resourcesApi.update(editing, buildPayload());
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-resources'] });
       closeForm();
     },
-    onError: (e) => setError((e as Error).message),
+    onError: (e) => setError(extractError(e)),
   });
 
   const deleteMut = useMutation({
@@ -241,8 +286,13 @@ export function AdminCourtsPage() {
                 value={form.timezone}
                 onChange={(e) => setForm((f) => ({ ...f, timezone: e.target.value }))}
               >
-                {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>{tz}</option>
+                {Object.entries(TIMEZONES_BY_REGION).map(([region, tzs]) => (
+                  <optgroup key={region} label={region}>
+                    {tzs.map((tz) => {
+                      const city = tz.includes('/') ? tz.split('/').pop()!.replace(/_/g, ' ') : tz;
+                      return <option key={tz} value={tz}>{city}</option>;
+                    })}
+                  </optgroup>
                 ))}
               </select>
             </label>
@@ -325,7 +375,7 @@ export function AdminCourtsPage() {
                 </td>
                 <td>{r.mode === 'EXCLUSIVE' ? 'Exclusivo' : 'Compartido'}</td>
                 <td>{r.capacity}</td>
-                <td>{r.timezone}</td>
+                <td>{r.timezone.includes('/') ? r.timezone.split('/').pop()!.replace(/_/g, ' ') : r.timezone}</td>
                 <td>
                   <span className={`badge ${r.isActive ? 'badge-confirmed' : 'badge-cancelled'}`}>
                     {r.isActive ? 'Activa' : 'Inactiva'}
