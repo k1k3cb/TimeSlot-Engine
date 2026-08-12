@@ -66,7 +66,20 @@ export interface Booking {
   notes: string | null;
   cancelledAt: string | null;
   refundPct: number | null;
-  resource: { id: string; name: string; timezone: string };
+  resource: { id: string; name: string; timezone?: string };
+  user?: { id: string; name: string; email: string };
+}
+
+export interface TieredRule {
+  hoursBeforeStart: number;
+  refundPct: number;
+  label?: string;
+}
+
+export interface CancellationPolicy {
+  id: string;
+  resourceId: string | null;
+  rules: TieredRule[];
 }
 
 export interface BookingEvent {

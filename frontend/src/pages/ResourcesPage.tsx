@@ -30,6 +30,10 @@ export function ResourcesPage() {
       <header className="topbar">
         <h1>Canchas</h1>
         <div className="user-info">
+          {user?.role === 'ADMIN' && (
+            <Link to="/admin" className="link-btn">Admin</Link>
+          )}
+          <Link to="/bookings" className="link-btn">Mis reservas</Link>
           <span>
             {user?.name} <small>({user?.role})</small>
           </span>

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/endpoints';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const registered = (location.state as { registered?: boolean })?.registered;
   const [email, setEmail] = useState('admin@timeslot.dev');
   const [password, setPassword] = useState('Admin#2026');
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +36,8 @@ export function LoginPage() {
       <form onSubmit={handleSubmit} className="auth-card">
         <h1>TimeSlot</h1>
         <p className="muted">Inicia sesión para continuar</p>
+
+        {registered && <div className="success">Cuenta creada. Ahora inicia sesión.</div>}
 
         <label>
           <span>Email</span>
@@ -67,6 +71,10 @@ export function LoginPage() {
           Seed: <code>admin@timeslot.dev</code> / <code>Admin#2026</code>
           <br />
           Cliente: <code>juan@timeslot.dev</code> / <code>Client#2026</code>
+        </p>
+
+        <p className="hint">
+          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
         </p>
       </form>
     </div>
