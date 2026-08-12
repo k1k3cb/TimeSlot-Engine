@@ -32,51 +32,93 @@ export function LoginPage() {
   }
 
   return (
-    <div className="auth-page">
-      <form onSubmit={handleSubmit} className="auth-card">
-        <h1>TimeSlot</h1>
-        <p className="muted">Inicia sesión para continuar</p>
+    <div className="login-page">
+      <div className="login-bg">
+        <div className="login-court-lines" aria-hidden="true">
+          <div className="court-line court-line-h court-line-1" />
+          <div className="court-line court-line-h court-line-2" />
+          <div className="court-line court-line-v court-line-3" />
+          <div className="court-line court-line-v court-line-4" />
+          <div className="court-line court-line-net" />
+        </div>
+        <div className="login-bg-gradient" />
+      </div>
 
-        {registered && <div className="success">Cuenta creada. Ahora inicia sesión.</div>}
+      <div className="login-content">
+        <div className="login-brand">
+          <span className="login-mark">TS</span>
+          <span className="login-logo">TimeSlot</span>
+        </div>
 
-        <label>
-          <span>Email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-        </label>
+        <form onSubmit={handleSubmit} className="login-card">
+          <div className="login-card-header">
+            <h1>Bienvenido</h1>
+            <p>Inicia sesión para gestionar tus reservas</p>
+          </div>
 
-        <label>
-          <span>Contraseña</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-          />
-        </label>
+          {registered && (
+            <div className="login-success">Cuenta creada. Ahora inicia sesión.</div>
+          )}
 
-        {error && <div className="error">{error}</div>}
+          <label className="login-field">
+            <span>Email</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="tu@email.com"
+              required
+              autoComplete="email"
+            />
+          </label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Entrando...' : 'Entrar'}
-        </button>
+          <label className="login-field">
+            <span>Contraseña</span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+            />
+          </label>
 
-        <p className="hint">
-          Seed: <code>admin@timeslot.dev</code> / <code>Admin#2026</code>
-          <br />
-          Cliente: <code>juan@timeslot.dev</code> / <code>Client#2026</code>
-        </p>
+          {error && <div className="login-error">{error}</div>}
 
-        <p className="hint">
-          ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
-        </p>
-      </form>
+          <button type="submit" className="login-submit" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
+
+          <div className="login-footer">
+            <p>
+              ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+            </p>
+          </div>
+        </form>
+
+        <div className="login-demo">
+          <p className="login-demo-title">Cuentas de prueba</p>
+          <div className="login-demo-accounts">
+            <button
+              type="button"
+              className="login-demo-btn"
+              onClick={() => { setEmail('admin@timeslot.dev'); setPassword('Admin#2026'); }}
+            >
+              <span className="login-demo-role">Admin</span>
+              <span className="login-demo-email">admin@timeslot.dev</span>
+            </button>
+            <button
+              type="button"
+              className="login-demo-btn"
+              onClick={() => { setEmail('juan@timeslot.dev'); setPassword('Client#2026'); }}
+            >
+              <span className="login-demo-role">Cliente</span>
+              <span className="login-demo-email">juan@timeslot.dev</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
