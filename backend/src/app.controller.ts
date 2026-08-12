@@ -37,6 +37,7 @@ export class AppController {
           cancel: 'PATCH /api/bookings/:id/cancel',
           confirm: 'PATCH /api/bookings/:id/confirm (ADMIN)',
           complete: 'PATCH /api/bookings/:id/complete (ADMIN)',
+          noShow: 'PATCH /api/bookings/:id/no-show (ADMIN)',
         },
         policies: {
           defaults: 'GET /api/policies/defaults',

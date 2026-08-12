@@ -125,8 +125,22 @@ export class BookingsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Marcar reserva como completada (ADMIN)' })
   @ApiResponse({ status: 200, description: 'Reserva completada', type: BookingResponseDto })
+  @ApiResponse({ status: 400, description: 'Estado inválido para completar', type: ErrorResponseDto })
   @ApiResponse({ status: 404, description: 'Reserva no encontrada', type: ErrorResponseDto })
   complete(@Param('id', ParseCuidPipe) id: string) {
     return this.bookings.complete(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id/no-show')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Marcar reserva como no-show (ADMIN)', description: 'Marca una reserva como NO_SHOW. Solo permitido después de la hora de inicio y si la reserva está PENDING o CONFIRMED.' })
+  @ApiResponse({ status: 200, description: 'Reserva marcada como no-show', type: BookingResponseDto })
+  @ApiResponse({ status: 400, description: 'Estado inválido o reserva aún no ha iniciado', type: ErrorResponseDto })
+  @ApiResponse({ status: 404, description: 'Reserva no encontrada', type: ErrorResponseDto })
+  markNoShow(@Param('id', ParseCuidPipe) id: string) {
+    return this.bookings.markNoShow(id);
   }
 }

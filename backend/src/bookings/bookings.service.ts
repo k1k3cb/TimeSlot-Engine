@@ -187,9 +187,30 @@ export class BookingsService {
   }
 
   async complete(id: string): Promise<Booking> {
+    const booking = await this.prisma.booking.findUnique({ where: { id } });
+    if (!booking) throw new NotFoundException(`Booking ${id} not found`);
+    if (booking.status === 'CANCELLED' || booking.status === 'NO_SHOW') {
+      throw new BadRequestException(`Cannot complete booking in state ${booking.status}`);
+    }
     return this.prisma.booking.update({
       where: { id },
       data: { status: 'COMPLETED' },
+    });
+  }
+
+  async markNoShow(id: string): Promise<Booking> {
+    const booking = await this.prisma.booking.findUnique({ where: { id } });
+    if (!booking) throw new NotFoundException(`Booking ${id} not found`);
+    if (booking.status !== 'CONFIRMED' && booking.status !== 'PENDING') {
+      throw new BadRequestException(`Cannot mark no-show for booking in state ${booking.status}`);
+    }
+    const now = new Date();
+    if (booking.startAt > now) {
+      throw new BadRequestException('Cannot mark no-show before the booking start time');
+    }
+    return this.prisma.booking.update({
+      where: { id },
+      data: { status: 'NO_SHOW' },
     });
   }
 
