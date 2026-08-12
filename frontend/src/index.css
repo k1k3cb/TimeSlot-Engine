@@ -45,6 +45,143 @@ button:disabled, .link-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   gap: 1rem;
 }
 
+/* ── Court cards ── */
+.court-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.court-card {
+  display: flex;
+  flex-direction: column;
+  background: #0c1222;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.court-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 14px 0 0 14px;
+}
+
+.court-accent-padel::before { background: #10b981; }
+.court-accent-tenis::before { background: #3b82f6; }
+.court-accent-default::before { background: #8b5cf6; }
+
+.court-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.court-accent-padel:hover { border-color: rgba(16, 185, 129, 0.25); }
+.court-accent-tenis:hover { border-color: rgba(59, 130, 246, 0.25); }
+.court-accent-default:hover { border-color: rgba(139, 92, 246, 0.25); }
+
+.court-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0;
+}
+
+.court-type-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
+
+.court-accent-padel .court-type-badge {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+
+.court-accent-tenis .court-type-badge {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+.court-closed {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--danger);
+  opacity: 0.8;
+}
+
+.court-card-body {
+  padding: 0.75rem 1.25rem 0;
+  flex: 1;
+}
+
+.court-name {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.court-desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.court-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.court-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.court-info-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.court-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: gap 0.2s ease;
+}
+
+.court-card:hover .court-cta {
+  gap: 0.6rem;
+}
+
+/* ── Legacy card (keep for admin) ── */
 .card {
   background: #0c1222;
   border: 1px solid rgba(255, 255, 255, 0.06);
