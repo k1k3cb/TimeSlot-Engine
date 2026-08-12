@@ -226,152 +226,159 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   color: var(--ink);
 }
 
-/* ── Hero ── */
-.hero {
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  margin-bottom: 2.5rem;
-  min-height: 280px;
-  display: flex;
-  align-items: flex-end;
-  background: linear-gradient(135deg, #0a3a2a 0%, #0d4a34 40%, #145a3e 100%);
+/* ── Home container ── */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
-.hero::before {
-  content: '';
+/* ── Hero ── */
+.home-hero {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.home-hero-bg {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 50px 50px;
-  opacity: 0.6;
+  background: linear-gradient(135deg, #0c4a6e 0%, #075985 40%, #0369a1 70%, #0ea5e9 100%);
 }
 
-.hero-content {
+.home-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 40%, transparent 70%);
+}
+
+.home-hero-content {
   position: relative;
   z-index: 1;
-  padding: 2.5rem;
+  padding: 3rem;
   max-width: 550px;
 }
 
-.hero-badge {
+.home-hero-badge {
   display: inline-block;
   background: var(--primary);
   color: var(--primary-foreground);
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 9999px;
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 1rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
 }
 
-.hero h2 {
+.home-hero-content h1 {
   margin: 0 0 0.75rem;
-  font-size: 2.25rem;
-  font-weight: 800;
+  font-size: 2.5rem;
+  font-weight: 700;
   color: #ffffff;
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
-.hero p {
+.home-hero-content p {
   margin: 0;
-  color: rgba(255,255,255,0.75);
-  font-size: 0.95rem;
+  color: rgba(255,255,255,0.8);
+  font-size: 1rem;
   line-height: 1.6;
 }
 
-/* ── Courts section ── */
-.courts-section-header {
-  margin-bottom: 0.75rem;
+/* ── Section ── */
+.home-section {
+  margin-bottom: 3rem;
 }
 
-.courts-section-header h2 {
-  margin: 0 0 0.1rem;
-  font-size: 1.35rem;
+.home-section-header {
+  margin-bottom: 1rem;
+}
+
+.home-section-header h2 {
+  margin: 0 0 0.15rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
-.courts-section-header .count {
+.home-section-header p {
+  margin: 0;
   color: var(--muted-foreground);
   font-size: 0.875rem;
-  margin: 0;
 }
 
-.courts-filters {
+/* ── Filters ── */
+.home-filters {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
-.courts-filter-btn {
+.home-filter-btn {
   background: var(--card);
   color: var(--muted-foreground);
   border: 1px solid var(--border);
-  padding: 0.4rem 0.9rem;
+  padding: 0.5rem 1.1rem;
   border-radius: 9999px;
-  font-size: 0.825rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: var(--font-sans);
 }
 
-.courts-filter-btn:hover {
+.home-filter-btn:hover {
   border-color: var(--muted-foreground);
   color: var(--foreground);
 }
 
-.courts-filter-btn.active {
+.home-filter-btn.active {
   background: var(--foreground);
   color: var(--card);
   border-color: var(--foreground);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* ── Court card ── */
-.courts-grid {
+/* ── Court cards grid ── */
+.home-courts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
 
-.court-card {
+/* ── Court card ── */
+.home-court-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 16px;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   color: var(--card-foreground);
+  text-decoration: none;
 }
 
-.court-card:hover {
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  border-color: transparent;
+.home-court-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
   transform: translateY(-2px);
 }
 
-.court-card-image {
+.home-court-image {
   position: relative;
-  height: 220px;
-  background: linear-gradient(135deg, #0c1929 0%, #162544 100%);
+  height: 240px;
   overflow: hidden;
 }
 
-.court-card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.court-card-image-placeholder {
+.home-court-image-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
@@ -379,114 +386,101 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   justify-content: center;
 }
 
-.court-card-badge {
+.home-court-sport-badge {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  background: var(--card);
+  top: 1rem;
+  left: 1rem;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(8px);
   color: var(--foreground);
-  padding: 0.2rem 0.55rem;
-  border-radius: calc(var(--radius) * 0.6);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.court-card-rating {
+.home-court-rating {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  background: var(--card);
-  color: var(--foreground);
-  padding: 0.2rem 0.5rem;
-  border-radius: calc(var(--radius) * 0.6);
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(8px);
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
   font-size: 0.8rem;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
+  color: var(--foreground);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.court-card-rating svg {
-  color: var(--accent);
-}
-
-.court-card-body {
+.home-court-body {
   padding: 1.25rem;
-  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
-.court-card-name {
-  margin: 0 0 0.3rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.court-card-desc {
-  margin: 0 0 0.75rem;
-  color: var(--muted-foreground);
-  font-size: 0.85rem;
-  line-height: 1.5;
-  flex: 1;
-}
-
-.court-card-meta {
+.home-court-top {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.825rem;
-  color: var(--muted-foreground);
-}
-
-.court-card-meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.court-card-footer {
-  display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
-.court-card-price {
+.home-court-top h3 {
+  margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
-.court-card-price span {
+.home-court-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.home-court-price span {
   font-size: 0.8rem;
   font-weight: 400;
   color: var(--muted-foreground);
 }
 
-.court-card-book {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  padding: 0.5rem 1.1rem;
-  border-radius: calc(var(--radius) * 0.8);
-  font-size: 0.85rem;
-  font-weight: 600;
+.home-court-location {
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: var(--font-sans);
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
 }
 
-.court-card-book:hover {
-  opacity: 0.9;
+.home-court-location svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.home-court-tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.home-court-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: calc(var(--radius) * 0.6);
+  background: var(--secondary);
+  color: var(--muted-foreground);
 }
 
 /* ── Booking section ── */
@@ -2313,11 +2307,10 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .client-nav-user-info { display: none; }
   .client-content { padding: 1.25rem; }
 
-  .hero { min-height: 200px; }
-  .hero-content { padding: 1.5rem; }
-  .hero h2 { font-size: 1.5rem; }
-
-  .courts-grid { grid-template-columns: 1fr; }
+  .home-hero { height: 320px; border-radius: 16px; }
+  .home-hero-content { padding: 1.5rem; }
+  .home-hero-content h1 { font-size: 1.75rem; }
+  .home-courts-grid { grid-template-columns: 1fr; }
 
   .booking-card { flex-direction: column; align-items: stretch; }
   .booking-card-image { width: 100%; height: 120px; }

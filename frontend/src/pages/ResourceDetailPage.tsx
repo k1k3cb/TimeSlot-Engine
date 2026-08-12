@@ -289,7 +289,7 @@ export function ResourceDetailPage() {
                   <div>
                     <span className="detail-price-label">Precio por turno</span>
                     <div className="detail-price-value">
-                      $12.000 <span className="detail-price-unit">/ {duration} min</span>
+                      €12.000,00 <span className="detail-price-unit">/ {duration} min</span>
                     </div>
                   </div>
                   <span className="detail-price-badge">Cancha Rápida</span>
