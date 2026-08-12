@@ -1,6 +1,8 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
@@ -39,6 +41,29 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('TimeSlot Engine')
+    .setDescription(
+      'Sistema de gestión de reservas de canchas de pádel. ' +
+      'Autenticación JWT, motor de disponibilidad con timezone, ' +
+      'prevención de solapamientos via constraint EXCLUDE en PostgreSQL, ' +
+      'políticas de cancelación configurables, y notificaciones WebSocket.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
+    .addServer('http://localhost:3000')
+    .addTag('auth', 'Autenticación y registro de usuarios')
+    .addTag('resources', 'Gestión de canchas (CRUD admin)')
+    .addTag('availability', 'Motor de slots disponibles')
+    .addTag('bookings', 'Reservas de canchas')
+    .addTag('policies', 'Políticas de cancelación')
+    .build();
+
+  const doc = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, doc);
+
+  app.use('/reference', apiReference({ url: '/docs-json' }));
 
   if (process.env.ENABLE_SHUTDOWN_HOOKS === 'true') {
     app.enableShutdownHooks();
