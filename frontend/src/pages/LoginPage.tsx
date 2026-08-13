@@ -41,7 +41,7 @@ export function LoginPage() {
           <span className="login-left-brand-text">TimeSlot</span>
         </div>
         <div className="login-left-content">
-          <h2>Tu próximo partido empieza acá.</h2>
+          <h2>Tu próximo partido empieza aquí.</h2>
           <p>Gestiona todas tus reservas de pádel, tenis y fútbol desde un único lugar.</p>
         </div>
       </div>
