@@ -20,7 +20,9 @@ export function LoginPage() {
     try {
       const data = await authApi.login(email, password);
       setAuth(data);
-      navigate(data.user.role === 'ADMIN' ? '/admin' : '/');
+      setTimeout(() => {
+        navigate(data.user.role === 'ADMIN' ? '/admin' : '/');
+      }, 0);
     } catch (err) {
       const message =
         (err as { response?: { data?: { message?: string } } }).response?.data?.message ??

@@ -1158,9 +1158,34 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: calc(var(--radius) * 0.6);
 }
 
+.admin-new-booking-btn {
+  width: calc(100% - 1.5rem);
+  margin: 0 0.75rem 1rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: calc(var(--radius) * 0.8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(40,108,0,0.15);
+}
+
+.admin-new-booking-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(40,108,0,0.2);
+}
+
 .admin-nav {
   flex: 1;
-  padding: 0.75rem;
+  padding: 0 0.75rem;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -2000,6 +2025,465 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   color: var(--muted-foreground);
 }
 
+/* ── Policies bento ── */
+.policies-bento {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.policies-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.policies-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--secondary);
+}
+
+.policies-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.policies-card-title h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.policies-edit-btn {
+  background: none;
+  color: var(--primary);
+  border: 1px solid transparent;
+  padding: 0.35rem 0.75rem;
+  border-radius: calc(var(--radius) * 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+}
+
+.policies-edit-btn:hover {
+  background: rgba(40,108,0,0.08);
+  border-color: var(--primary);
+}
+
+.policies-card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Rules table */
+.policies-rules-table {
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.8);
+  overflow: hidden;
+}
+
+.policies-rules-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0.75rem 1rem;
+  background: var(--secondary);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.policies-rules-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 1rem;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.policies-rules-row:last-child {
+  border-bottom: none;
+}
+
+.policies-rules-row:hover {
+  background: var(--secondary);
+}
+
+.policies-rules-hours {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.policies-refund-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.refund-high {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.refund-mid {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.refund-none {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Select */
+.policies-select-group {
+  margin-bottom: 1rem;
+}
+
+.policies-select-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--foreground);
+}
+
+.policies-select-wrap {
+  position: relative;
+}
+
+.policies-select {
+  width: 100%;
+  appearance: none;
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.8);
+  padding: 0.6rem 2.5rem 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+.policies-select:focus {
+  outline: none;
+  border-color: var(--ring);
+}
+
+.policies-select-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+
+/* Empty state */
+.policies-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: calc(var(--radius) * 0.8);
+  background: var(--secondary);
+  gap: 0.5rem;
+}
+
+.policies-empty-state p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  max-width: 250px;
+}
+
+.policies-create-btn {
+  width: 100%;
+  background: none;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  padding: 0.65rem;
+  border-radius: calc(var(--radius) * 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+}
+
+.policies-create-btn:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+/* Impact panel */
+.policies-impact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.policies-impact-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.policies-impact-text {
+  flex: 1;
+}
+
+.policies-impact-text h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.policies-impact-text p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.policies-impact-text strong { color: var(--foreground); }
+.policies-impact-text em { font-style: italic; }
+
+.policies-impact-btn {
+  background: none;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 0.5rem 1rem;
+  border-radius: calc(var(--radius) * 0.8);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.policies-impact-btn:hover {
+  background: rgba(40,108,0,0.08);
+}
+
+/* Editor */
+.policies-editor {
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.8);
+  padding: 1rem;
+}
+
+.policies-editor-row {
+  display: flex;
+  align-items: end;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.policies-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.policies-editor-field span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.policies-editor-field input {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.6);
+  padding: 0.4rem 0.6rem;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  width: 100%;
+}
+
+.policies-editor-field input:focus {
+  outline: none;
+  border-color: var(--ring);
+}
+
+.policies-editor-remove {
+  background: none;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 0.4rem 0.65rem;
+  border-radius: calc(var(--radius) * 0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+
+.policies-editor-remove:hover {
+  background: #fee2e2;
+}
+
+.policies-editor-add {
+  background: none;
+  color: var(--primary);
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.75rem;
+  border-radius: calc(var(--radius) * 0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+.policies-editor-add:hover {
+  background: var(--card);
+}
+
+.policies-editor-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Admin primary button ── */
+.admin-primary-btn {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: calc(var(--radius) * 0.8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 8px rgba(40,108,0,0.12);
+}
+
+.admin-primary-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(40,108,0,0.18);
+}
+
+/* ── Court table cells ── */
+.admin-court-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.admin-court-desc {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.15rem;
+}
+
+/* ── Status pill ── */
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-status-active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.admin-status-inactive {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ── Outline buttons ── */
+.admin-btn-outline {
+  background: none;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.75rem;
+  border-radius: calc(var(--radius) * 0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+}
+
+.admin-btn-outline:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+
+.admin-btn-outline-danger {
+  background: none;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 0.35rem 0.75rem;
+  border-radius: calc(var(--radius) * 0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+}
+
+.admin-btn-outline-danger:hover {
+  background: #fee2e2;
+}
+
 /* ── Admin page label ── */
 .admin-page-label {
   margin: 0 0 0.2rem;
@@ -2026,6 +2510,43 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.admin-stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.admin-stat-card:hover::before {
+  transform: translateX(0);
+}
+
+.admin-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.admin-stat-card:nth-child(1)::before { background: rgba(0,0,0,0.02); }
+.admin-stat-card:nth-child(2)::before { background: rgba(34,197,94,0.04); }
+.admin-stat-card:nth-child(3)::before { background: rgba(245,158,11,0.04); }
+.admin-stat-card:nth-child(4)::before { background: rgba(239,68,68,0.04); }
+.admin-stat-card:nth-child(4) { border-color: rgba(239,68,68,0.2); }
+
+.admin-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .admin-stat-icon {
@@ -2335,6 +2856,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   .admin-user-card { margin: 0; padding: 0.4rem; }
   .admin-content { padding: 1rem; }
   .admin-form-grid { grid-template-columns: 1fr; }
+  .policies-bento { grid-template-columns: 1fr; }
+  .policies-impact { flex-direction: column; text-align: center; }
   .detail-grid { grid-template-columns: 1fr; }
   .detail-right { position: static; }
   .detail-amenities { grid-template-columns: repeat(2, 1fr); }

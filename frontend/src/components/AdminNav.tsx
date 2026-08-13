@@ -50,6 +50,14 @@ export function AdminNav() {
         <span className="admin-badge">Admin</span>
       </div>
 
+      <button className="admin-new-booking-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Nueva Reserva
+      </button>
+
       <nav className="admin-nav">
         {navItems.map((item) => (
           <NavLink
@@ -67,9 +75,8 @@ export function AdminNav() {
         <Link to="/" className="admin-nav-link admin-nav-external">
           <span className="admin-nav-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
             </svg>
           </span>
           <span className="admin-nav-label">Vista cliente</span>

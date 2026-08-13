@@ -7,52 +7,20 @@ const DAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 const TIMEZONES_BY_REGION: Record<string, string[]> = {
   'Europa': [
-    'Europe/Madrid',
-    'Europe/Barcelona',
-    'Europe/Berlin',
-    'Europe/Paris',
-    'Europe/Rome',
-    'Europe/London',
-    'Europe/Lisbon',
-    'Europe/Amsterdam',
-    'Europe/Brussels',
-    'Europe/Vienna',
-    'Europe/Zurich',
-    'Europe/Stockholm',
-    'Europe/Oslo',
-    'Europe/Copenhagen',
-    'Europe/Helsinki',
-    'Europe/Warsaw',
-    'Europe/Prague',
-    'Europe/Bucharest',
-    'Europe/Athens',
-    'Europe/Istanbul',
-    'Europe/Moscow',
+    'Europe/Madrid', 'Europe/Barcelona', 'Europe/Berlin', 'Europe/Paris',
+    'Europe/Rome', 'Europe/London', 'Europe/Lisbon', 'Europe/Amsterdam',
+    'Europe/Brussels', 'Europe/Vienna', 'Europe/Zurich', 'Europe/Stockholm',
+    'Europe/Oslo', 'Europe/Copenhagen', 'Europe/Helsinki', 'Europe/Warsaw',
+    'Europe/Prague', 'Europe/Bucharest', 'Europe/Athens', 'Europe/Istanbul',
   ],
   'América': [
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'America/Mexico_City',
-    'America/Bogota',
-    'America/Lima',
-    'America/Santiago',
-    'America/Buenos_Aires',
-    'America/Montevideo',
-    'America/Sao_Paulo',
-    'America/Toronto',
-    'America/Vancouver',
+    'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+    'America/Mexico_City', 'America/Bogota', 'America/Lima', 'America/Santiago',
+    'America/Buenos_Aires', 'America/Montevideo', 'America/Sao_Paulo',
   ],
   'Asia-Pacífico': [
-    'Asia/Tokyo',
-    'Asia/Shanghai',
-    'Asia/Singapore',
-    'Asia/Dubai',
-    'Asia/Kolkata',
-    'Australia/Sydney',
-    'Australia/Melbourne',
-    'Pacific/Auckland',
+    'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Dubai',
+    'Australia/Sydney', 'Australia/Melbourne', 'Pacific/Auckland',
   ],
   'UTC': ['UTC'],
 };
@@ -93,7 +61,7 @@ function fromSchedules(schedules: ResourceSchedule[]): ScheduleRow[] {
   return rows;
 }
 
-function toSchedules(rows: ScheduleRow[]): { dayOfWeek: number; openTime: string; closeTime: string }[] {
+function toSchedules(rows: ScheduleRow[]) {
   return rows.filter((r) => r.enabled).map((r) => ({
     dayOfWeek: r.dayOfWeek,
     openTime: r.openTime,
@@ -144,18 +112,13 @@ export function AdminCourtsPage() {
       isActive: form.isActive,
       schedules,
     };
-    if (form.description.trim()) {
-      payload.description = form.description.trim();
-    }
+    if (form.description.trim()) payload.description = form.description.trim();
     return payload;
   }
 
   const createMut = useMutation({
     mutationFn: () => resourcesApi.create(buildPayload()),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-resources'] });
-      closeForm();
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-resources'] }); closeForm(); },
     onError: (e) => setError(extractError(e)),
   });
 
@@ -164,10 +127,7 @@ export function AdminCourtsPage() {
       if (!editing) throw new Error('No editing');
       return resourcesApi.update(editing, buildPayload());
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-resources'] });
-      closeForm();
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-resources'] }); closeForm(); },
     onError: (e) => setError(extractError(e)),
   });
 
@@ -176,12 +136,7 @@ export function AdminCourtsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-resources'] }),
   });
 
-  function openCreate() {
-    setEditing(null);
-    setForm(EMPTY_FORM);
-    setError(null);
-    setShowForm(true);
-  }
+  function openCreate() { setEditing(null); setForm(EMPTY_FORM); setError(null); setShowForm(true); }
 
   function openEdit(r: Resource) {
     setEditing(r.id);
@@ -198,19 +153,12 @@ export function AdminCourtsPage() {
     setShowForm(true);
   }
 
-  function closeForm() {
-    setShowForm(false);
-    setEditing(null);
-    setForm(EMPTY_FORM);
-    setError(null);
-  }
+  function closeForm() { setShowForm(false); setEditing(null); setForm(EMPTY_FORM); setError(null); }
 
   function updateScheduleDay(day: number, field: keyof ScheduleRow, value: string | boolean) {
     setForm((prev) => ({
       ...prev,
-      schedules: prev.schedules.map((s, i) =>
-        i === day ? { ...s, [field]: value } : s,
-      ),
+      schedules: prev.schedules.map((s, i) => (i === day ? { ...s, [field]: value } : s)),
     }));
   }
 
@@ -226,10 +174,16 @@ export function AdminCourtsPage() {
     <div>
       <div className="admin-page-header">
         <h1>Canchas</h1>
-        <button onClick={openCreate}>Nueva cancha</button>
+        <button onClick={openCreate} className="admin-primary-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Nueva cancha
+        </button>
       </div>
 
-      {isLoading && <p>Cargando...</p>}
+      {isLoading && <p className="muted">Cargando...</p>}
 
       {showForm && (
         <div className="admin-form-card">
@@ -238,54 +192,26 @@ export function AdminCourtsPage() {
           <div className="admin-form-grid">
             <label>
               <span>Nombre</span>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                required
-                minLength={2}
-                maxLength={120}
-              />
+              <input type="text" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required minLength={2} maxLength={120} />
             </label>
-
             <label>
               <span>Descripción</span>
-              <input
-                type="text"
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                maxLength={500}
-              />
+              <input type="text" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} maxLength={500} />
             </label>
-
             <label>
               <span>Modo</span>
-              <select
-                value={form.mode}
-                onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value as BookingMode }))}
-              >
+              <select value={form.mode} onChange={(e) => setForm((f) => ({ ...f, mode: e.target.value as BookingMode }))}>
                 <option value="EXCLUSIVE">Exclusivo (1 persona)</option>
                 <option value="SHARED">Compartido (varias personas)</option>
               </select>
             </label>
-
             <label>
               <span>Capacidad</span>
-              <input
-                type="number"
-                value={form.capacity}
-                onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))}
-                min={1}
-                max={1000}
-              />
+              <input type="number" value={form.capacity} onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))} min={1} max={1000} />
             </label>
-
             <label>
               <span>Zona horaria</span>
-              <select
-                value={form.timezone}
-                onChange={(e) => setForm((f) => ({ ...f, timezone: e.target.value }))}
-              >
+              <select value={form.timezone} onChange={(e) => setForm((f) => ({ ...f, timezone: e.target.value }))}>
                 {Object.entries(TIMEZONES_BY_REGION).map(([region, tzs]) => (
                   <optgroup key={region} label={region}>
                     {tzs.map((tz) => {
@@ -296,13 +222,8 @@ export function AdminCourtsPage() {
                 ))}
               </select>
             </label>
-
             <label className="admin-checkbox-label">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-              />
+              <input type="checkbox" checked={form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} />
               <span>Activa</span>
             </label>
           </div>
@@ -313,26 +234,14 @@ export function AdminCourtsPage() {
               {form.schedules.map((s, i) => (
                 <div key={i} className="admin-schedule-row">
                   <label className="admin-checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={s.enabled}
-                      onChange={(e) => updateScheduleDay(i, 'enabled', e.target.checked)}
-                    />
+                    <input type="checkbox" checked={s.enabled} onChange={(e) => updateScheduleDay(i, 'enabled', e.target.checked)} />
                     <span>{DAYS[i]}</span>
                   </label>
                   {s.enabled && (
                     <>
-                      <input
-                        type="time"
-                        value={s.openTime}
-                        onChange={(e) => updateScheduleDay(i, 'openTime', e.target.value)}
-                      />
+                      <input type="time" value={s.openTime} onChange={(e) => updateScheduleDay(i, 'openTime', e.target.value)} />
                       <span className="muted">a</span>
-                      <input
-                        type="time"
-                        value={s.closeTime}
-                        onChange={(e) => updateScheduleDay(i, 'closeTime', e.target.value)}
-                      />
+                      <input type="time" value={s.closeTime} onChange={(e) => updateScheduleDay(i, 'closeTime', e.target.value)} />
                     </>
                   )}
                 </div>
@@ -344,10 +253,7 @@ export function AdminCourtsPage() {
 
           <div className="admin-form-actions">
             <button onClick={closeForm} className="admin-btn-secondary">Cancelar</button>
-            <button
-              onClick={() => editing ? updateMut.mutate() : createMut.mutate()}
-              disabled={saving}
-            >
+            <button onClick={() => editing ? updateMut.mutate() : createMut.mutate()} disabled={saving}>
               {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear cancha'}
             </button>
           </div>
@@ -361,41 +267,39 @@ export function AdminCourtsPage() {
               <th>Nombre</th>
               <th>Modo</th>
               <th>Cap.</th>
-              <th>Zona horaria</th>
+              <th>Zona Horaria</th>
               <th>Estado</th>
-              <th>Acciones</th>
+              <th style={{ textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {data?.map((r) => (
-              <tr key={r.id}>
-                <td>
-                  <strong>{r.name}</strong>
-                  {r.description && <p className="muted admin-cell-sub">{r.description}</p>}
-                </td>
-                <td>{r.mode === 'EXCLUSIVE' ? 'Exclusivo' : 'Compartido'}</td>
-                <td>{r.capacity}</td>
-                <td>{r.timezone.includes('/') ? r.timezone.split('/').pop()!.replace(/_/g, ' ') : r.timezone}</td>
-                <td>
-                  <span className={`badge ${r.isActive ? 'badge-confirmed' : 'badge-cancelled'}`}>
-                    {r.isActive ? 'Activa' : 'Inactiva'}
-                  </span>
-                </td>
-                <td>
-                  <div className="admin-row-actions">
-                    <button className="admin-btn-sm" onClick={() => openEdit(r)}>Editar</button>
-                    <button
-                      className="admin-btn-sm admin-btn-danger"
-                      onClick={() => handleDelete(r.id, r.name)}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {data?.map((r) => {
+              const city = r.timezone.includes('/') ? r.timezone.split('/').pop()!.replace(/_/g, ' ') : r.timezone;
+              return (
+                <tr key={r.id}>
+                  <td>
+                    <div className="admin-court-name">{r.name}</div>
+                    {r.description && <div className="admin-court-desc">{r.description}</div>}
+                  </td>
+                  <td>{r.mode === 'EXCLUSIVE' ? 'Exclusivo' : 'Compartido'}</td>
+                  <td style={{ textAlign: 'center' }}>{r.capacity}</td>
+                  <td>{city}</td>
+                  <td>
+                    <span className={`admin-status-pill ${r.isActive ? 'admin-status-active' : 'admin-status-inactive'}`}>
+                      {r.isActive ? 'Activa' : 'Inactiva'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="admin-row-actions" style={{ justifyContent: 'flex-end' }}>
+                      <button className="admin-btn-outline" onClick={() => openEdit(r)}>Editar</button>
+                      <button className="admin-btn-outline-danger" onClick={() => handleDelete(r.id, r.name)}>Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
             {data && data.length === 0 && (
-              <tr><td colSpan={6} className="muted">No hay canchas registradas.</td></tr>
+              <tr><td colSpan={6} className="muted" style={{ textAlign: 'center', padding: '2rem' }}>No hay canchas registradas.</td></tr>
             )}
           </tbody>
         </table>
