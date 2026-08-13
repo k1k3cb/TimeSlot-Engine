@@ -218,7 +218,7 @@ export function AdminBookingsPage() {
         {STATUS_FILTERS.map((f) => (
           <button
             key={f.value}
-            className={`courts-filter-btn ${status === f.value ? 'active' : ''}`}
+            className={`admin-filter-btn ${status === f.value ? 'active' : ''}`}
             onClick={() => setStatus(f.value)}
           >
             {f.label}
