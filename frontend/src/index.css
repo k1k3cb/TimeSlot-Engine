@@ -18,6 +18,7 @@
   --border: #dde5da;
   --input: #dde5da;
   --ring: #3bcc5f;
+  --danger: #dc2626;
   --radius: 0.9rem;
   --ink: #1c2b1c;
 
@@ -2485,12 +2486,22 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 /* ── Admin logout red ── */
+.admin-nav-logout-red,
+.admin-nav-logout-red .admin-nav-icon,
+.admin-nav-logout-red .admin-nav-label {
+  color: var(--danger) ;
+}
+
 .admin-nav-logout-red {
-  color: var(--danger) !important;
+  background: transparent;
 }
 
 .admin-nav-logout-red:hover {
-  background: rgba(239,68,68,0.08) !important;
+  background: rgba(255,218,214,0.5) !important;
+}
+
+.admin-nav-logout-red:hover .admin-nav-icon,
+.admin-nav-logout-red:hover .admin-nav-label {
   color: var(--danger) !important;
 }
 
