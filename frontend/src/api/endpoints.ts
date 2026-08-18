@@ -7,6 +7,7 @@ import type {
   Resource,
   TieredRule,
   CreateBookingInput,
+  User,
 } from '../types/domain';
 
 export const authApi = {
@@ -76,6 +77,10 @@ export const availabilityApi = {
     api
       .get<AvailabilityResponse>('/availability', { params })
       .then((r) => r.data),
+};
+
+export const usersApi = {
+  list: () => api.get<User[]>('/users').then((r) => r.data),
 };
 
 export const bookingsApi = {

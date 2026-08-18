@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
-import { bookingsApi, resourcesApi } from '../api/endpoints';
+import { bookingsApi, resourcesApi, usersApi, availabilityApi } from '../api/endpoints';
+import type { Booking, Resource, User, Slot } from '../types/domain';
 
 const STATUS_FILTERS = [
   { value: '', label: 'Todos' },
@@ -64,6 +65,7 @@ export function AdminBookingsPage() {
   const [status, setStatus] = useState('');
   const [resourceId, setResourceId] = useState('');
   const [search, setSearch] = useState('');
+  const [showCreate, setShowCreate] = useState(false);
 
   const { data: resources } = useQuery({
     queryKey: ['admin-resources-for-filter'],
@@ -91,6 +93,11 @@ export function AdminBookingsPage() {
 
   const noShow = useMutation({
     mutationFn: (id: string) => bookingsApi.markNoShow(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-bookings'] }),
+  });
+
+  const cancelBooking = useMutation({
+    mutationFn: (id: string) => bookingsApi.cancel(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-bookings'] }),
   });
 
@@ -126,7 +133,7 @@ export function AdminBookingsPage() {
             Gestiona y controla todas las reservas de tus canchas.
           </p>
         </div>
-        <button className="admin-primary-btn">
+        <button className="admin-primary-btn" onClick={() => { setEditingBooking(null); setShowCreate(true); }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
@@ -195,18 +202,9 @@ export function AdminBookingsPage() {
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input
-            type="text"
-            placeholder="Buscar por usuario o email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <input type="text" placeholder="Buscar por usuario o email..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <select
-          className="admin-toolbar-select"
-          value={resourceId}
-          onChange={(e) => setResourceId(e.target.value)}
-        >
+        <select className="admin-toolbar-select" value={resourceId} onChange={(e) => setResourceId(e.target.value)}>
           <option value="">Todas las canchas</option>
           {resources?.map((r) => (
             <option key={r.id} value={r.id}>{r.name}</option>
@@ -216,11 +214,7 @@ export function AdminBookingsPage() {
 
       <div className="admin-filters-row">
         {STATUS_FILTERS.map((f) => (
-          <button
-            key={f.value}
-            className={`admin-filter-btn ${status === f.value ? 'active' : ''}`}
-            onClick={() => setStatus(f.value)}
-          >
+          <button key={f.value} className={`admin-filter-btn ${status === f.value ? 'active' : ''}`} onClick={() => setStatus(f.value)}>
             {f.label}
           </button>
         ))}
@@ -253,9 +247,7 @@ export function AdminBookingsPage() {
                   <td>
                     <div className="admin-court-cell">
                       <strong>{b.resource.name}</strong>
-                      <span className={`admin-sport-badge admin-sport-${sportType}`}>
-                        {getSportLabel(sportType)}
-                      </span>
+                      <span className={`admin-sport-badge admin-sport-${sportType}`}>{getSportLabel(sportType)}</span>
                     </div>
                   </td>
                   <td>
@@ -277,9 +269,7 @@ export function AdminBookingsPage() {
                         {STATUS_LABELS[b.status] ?? b.status}
                       </span>
                       {b.refundPct != null && (
-                        <span className="admin-refund-badge">
-                          Reembolso<br />{b.refundPct}%
-                        </span>
+                        <span className="admin-refund-badge">Reembolso<br />{b.refundPct}%</span>
                       )}
                     </div>
                   </td>
@@ -287,21 +277,11 @@ export function AdminBookingsPage() {
                     <div className="admin-row-actions">
                       {b.status === 'CONFIRMED' && (
                         <>
-                          <button
-                            className="admin-btn-complete"
-                            disabled={attend.isPending}
-                            onClick={() => attend.mutate(b.id)}
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
+                          <button className="admin-btn-complete" disabled={attend.isPending} onClick={() => attend.mutate(b.id)}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                             Completar
                           </button>
-                          <button
-                            className="admin-btn-noshow"
-                            disabled={noShow.isPending}
-                            onClick={() => noShow.mutate(b.id)}
-                          >
+                          <button className="admin-btn-noshow" disabled={noShow.isPending} onClick={() => noShow.mutate(b.id)}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                               <circle cx="8.5" cy="7" r="4" />
@@ -313,19 +293,18 @@ export function AdminBookingsPage() {
                         </>
                       )}
                       {b.status === 'PENDING' && (
-                        <button
-                          className="admin-btn-complete"
-                          disabled={confirm.isPending}
-                          onClick={() => confirm.mutate(b.id)}
-                        >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
+                        <button className="admin-btn-complete" disabled={confirm.isPending} onClick={() => confirm.mutate(b.id)}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                           Completar
                         </button>
                       )}
+                      {(b.status === 'PENDING' || b.status === 'CONFIRMED') && (
+                        <button className="admin-btn-outline-danger" disabled={cancelBooking.isPending} onClick={() => cancelBooking.mutate(b.id)}>
+                          Cancelar
+                        </button>
+                      )}
                       {(b.status === 'CANCELLED' || b.status === 'COMPLETED' || b.status === 'NO_SHOW') && (
-                        <span className="muted">—</span>
+                        <span className="muted" style={{ display: 'none' }}>—</span>
                       )}
                     </div>
                   </td>
@@ -337,6 +316,293 @@ export function AdminBookingsPage() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {showCreate && (
+        <BookingModal
+          resources={resources ?? []}
+          onClose={() => setShowCreate(false)}
+          onSaved={() => { queryClient.invalidateQueries({ queryKey: ['admin-bookings'] }); setShowCreate(false); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function EditBookingModal({ booking, onClose, onAction }: {
+  booking: Booking;
+  onClose: () => void;
+  onAction: () => void;
+}) {
+  const confirm = useMutation({ mutationFn: () => bookingsApi.confirm(booking.id), onSuccess: onAction });
+  const attend = useMutation({ mutationFn: () => bookingsApi.attend(booking.id), onSuccess: onAction });
+  const noShow = useMutation({ mutationFn: () => bookingsApi.markNoShow(booking.id), onSuccess: onAction });
+  const cancel = useMutation({ mutationFn: () => bookingsApi.cancel(booking.id), onSuccess: onAction });
+
+  const tz = booking.resource?.timezone || 'UTC';
+  const start = DateTime.fromISO(booking.startAt).setZone(tz);
+  const end = DateTime.fromISO(booking.endAt).setZone(tz);
+  const dateStr = start.setLocale('es').toFormat("cccc d 'de' MMMM yyyy");
+  const timeStr = `${start.toFormat('HH:mm')} – ${end.toFormat('HH:mm')}`;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+        <div className="modal-header">
+          <h2>Detalle de Reserva</h2>
+          <button className="modal-close" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <div className="edit-booking-info">
+            <div className="edit-booking-row">
+              <span className="edit-booking-label">Cancha</span>
+              <span className="edit-booking-value">{booking.resource?.name}</span>
+            </div>
+            <div className="edit-booking-row">
+              <span className="edit-booking-label">Usuario</span>
+              <span className="edit-booking-value">{booking.user?.name ?? booking.userId}</span>
+            </div>
+            {booking.user?.email && (
+              <div className="edit-booking-row">
+                <span className="edit-booking-label">Email</span>
+                <span className="edit-booking-value">{booking.user.email}</span>
+              </div>
+            )}
+            <div className="edit-booking-row">
+              <span className="edit-booking-label">Fecha</span>
+              <span className="edit-booking-value">{dateStr}</span>
+            </div>
+            <div className="edit-booking-row">
+              <span className="edit-booking-label">Horario</span>
+              <span className="edit-booking-value">{timeStr}</span>
+            </div>
+            <div className="edit-booking-row">
+              <span className="edit-booking-label">Estado</span>
+              <span className={`admin-status-badge ${getStatusBadgeClass(booking.status)}`}>
+                <span className={`admin-status-dot ${getStatusDotClass(booking.status)}`} />
+                {STATUS_LABELS[booking.status] ?? booking.status}
+              </span>
+            </div>
+            {booking.refundPct != null && (
+              <div className="edit-booking-row">
+                <span className="edit-booking-label">Reembolso</span>
+                <span className="edit-booking-value">{booking.refundPct}%</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="modal-footer" style={{ flexWrap: 'wrap' }}>
+          {booking.status === 'PENDING' && (
+            <button className="admin-primary-btn" disabled={confirm.isPending} onClick={() => confirm.mutate()}>
+              {confirm.isPending ? 'Confirmando...' : 'Confirmar'}
+            </button>
+          )}
+          {booking.status === 'CONFIRMED' && (
+            <>
+              <button className="admin-primary-btn" disabled={attend.isPending} onClick={() => attend.mutate()}>
+                {attend.isPending ? 'Marcando...' : 'Marcar asistencia'}
+              </button>
+              <button className="admin-btn-outline-danger" disabled={noShow.isPending} onClick={() => noShow.mutate()}>
+                No show
+              </button>
+            </>
+          )}
+          {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
+            <button className="admin-btn-outline-danger" disabled={cancel.isPending} onClick={() => cancel.mutate()}>
+              {cancel.isPending ? 'Cancelando...' : 'Cancelar reserva'}
+            </button>
+          )}
+          <button className="admin-btn-secondary" onClick={onClose}>Cerrar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BookingModal({ resources, onClose, onSaved }: {
+  resources: Resource[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const queryClient = useQueryClient();
+  const [userId, setUserId] = useState('');
+  const [resourceId, setResourceId] = useState('');
+  const [date, setDate] = useState(() => DateTime.now().plus({ days: 1 }).toISODate()!);
+  const [duration, setDuration] = useState(60);
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [userSearch, setUserSearch] = useState('');
+
+  const { data: users } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: () => usersApi.list(),
+  });
+
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    if (!userSearch.trim()) return users.filter((u) => u.role === 'CLIENT');
+    const q = userSearch.toLowerCase();
+    return users.filter((u) => u.role === 'CLIENT' && (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)));
+  }, [users, userSearch]);
+
+  const { data: availability } = useQuery({
+    queryKey: ['admin-availability', resourceId, date, duration],
+    queryFn: () => availabilityApi.compute({ resourceId, date, slotMinutes: duration }),
+    enabled: !!resourceId && !!date,
+  });
+
+  const selectedUser = users?.find((u) => u.id === userId);
+  const selectedResource = resources.find((r) => r.id === resourceId);
+  const slots = availability?.slots ?? [];
+
+  const createMut = useMutation({
+    mutationFn: () => {
+      if (!selectedSlot) throw new Error('Selecciona un horario');
+      return bookingsApi.create({
+        resourceId,
+        startAt: selectedSlot.start,
+        durationMinutes: duration,
+      });
+    },
+    onSuccess: onSaved,
+    onError: (e) => setError((e as Error).message || 'Error al crear reserva'),
+  });
+
+  const tz = availability?.timezone ?? selectedResource?.timezone ?? 'UTC';
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Nueva Reserva</h2>
+          <button className="modal-close" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="modal-body">
+          {/* Usuario */}
+          <div className="form-field">
+            <label>Buscar usuario <span className="required">*</span></label>
+            <input
+              type="text"
+              placeholder="Buscar por nombre o email..."
+              value={userSearch}
+              onChange={(e) => { setUserSearch(e.target.value); if (!e.target.value) setUserId(''); }}
+            />
+            {userSearch && filteredUsers.length > 0 && (
+              <div className="modal-user-list">
+                {filteredUsers.slice(0, 5).map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    className={`modal-user-item ${userId === u.id ? 'selected' : ''}`}
+                    onClick={() => { setUserId(u.id); setUserSearch(u.name); }}
+                  >
+                    <span className="modal-user-avatar">{u.name.charAt(0).toUpperCase()}</span>
+                    <div>
+                      <span className="modal-user-name">{u.name}</span>
+                      <span className="modal-user-email">{u.email}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            {selectedUser && (
+              <div className="modal-selected-user">
+                <span className="modal-user-avatar">{selectedUser.name.charAt(0).toUpperCase()}</span>
+                <div>
+                  <span className="modal-user-name">{selectedUser.name}</span>
+                  <span className="modal-user-email">{selectedUser.email}</span>
+                </div>
+                <button type="button" onClick={() => { setUserId(''); setUserSearch(''); }}>×</button>
+              </div>
+            )}
+          </div>
+
+          {/* Cancha */}
+          <div className="form-field">
+            <label>Cancha <span className="required">*</span></label>
+            <div className="form-select-wrap">
+              <select value={resourceId} onChange={(e) => { setResourceId(e.target.value); setSelectedSlot(null); }}>
+                <option value="">Seleccionar cancha...</option>
+                {resources.map((r) => (
+                  <option key={r.id} value={r.id}>{r.name}</option>
+                ))}
+              </select>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="form-select-icon"><polyline points="6 9 12 15 18 9" /></svg>
+            </div>
+          </div>
+
+          {/* Fecha */}
+          <div className="form-field">
+            <label>Fecha <span className="required">*</span></label>
+            <input type="date" value={date} min={DateTime.now().toISODate()!} onChange={(e) => { setDate(e.target.value); setSelectedSlot(null); }} />
+          </div>
+
+          {/* Duración */}
+          <div className="form-field">
+            <label>Duración</label>
+            <div className="form-select-wrap">
+              <select value={duration} onChange={(e) => { setDuration(Number(e.target.value)); setSelectedSlot(null); }}>
+                <option value={60}>60 min</option>
+                <option value={90}>90 min</option>
+                <option value={120}>120 min</option>
+              </select>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="form-select-icon"><polyline points="6 9 12 15 18 9" /></svg>
+            </div>
+          </div>
+
+          {/* Slots */}
+          {resourceId && date && (
+            <div className="form-field">
+              <label>Horarios disponibles</label>
+              <div className="modal-slots">
+                {slots.length === 0 ? (
+                  <p className="muted">No hay horarios disponibles para esta fecha</p>
+                ) : (
+                  slots.map((s) => {
+                    const local = DateTime.fromISO(s.start).setZone(tz);
+                    const isSelected = selectedSlot?.start === s.start;
+                    return (
+                      <button
+                        key={s.start}
+                        type="button"
+                        className={`modal-slot ${isSelected ? 'selected' : ''}`}
+                        onClick={() => setSelectedSlot(s)}
+                      >
+                        {local.toFormat('HH:mm')}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
+
+          {error && <div className="error">{error}</div>}
+        </div>
+
+        <div className="modal-footer">
+          <button className="admin-btn-secondary" onClick={onClose}>Cancelar</button>
+          <button
+            className="admin-primary-btn"
+            disabled={!userId || !resourceId || !selectedSlot || createMut.isPending}
+            onClick={() => createMut.mutate()}
+          >
+            {createMut.isPending ? 'Creando...' : 'Crear Reserva'}
+          </button>
+        </div>
       </div>
     </div>
   );
