@@ -2838,6 +2838,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   background: rgba(40,108,0,0.03);
 }
 
+.form-upload-box.drag-active {
+  border-color: var(--primary);
+  background: rgba(40,108,0,0.08);
+  border-style: solid;
+}
+
 .form-upload-box input {
   position: absolute;
   inset: 0;
@@ -2874,6 +2880,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .form-upload-zone:hover {
   border-color: var(--primary);
   background: rgba(40,108,0,0.03);
+}
+
+.form-upload-zone.drag-active {
+  border-color: var(--primary);
+  background: rgba(40,108,0,0.08);
+  border-style: solid;
 }
 
 .form-upload-zone input {

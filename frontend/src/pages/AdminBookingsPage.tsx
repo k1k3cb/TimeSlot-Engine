@@ -133,7 +133,7 @@ export function AdminBookingsPage() {
             Gestiona y controla todas las reservas de tus canchas.
           </p>
         </div>
-        <button className="admin-primary-btn" onClick={() => { setEditingBooking(null); setShowCreate(true); }}>
+        <button className="admin-primary-btn" onClick={() => setShowCreate(true)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
@@ -325,103 +325,6 @@ export function AdminBookingsPage() {
           onSaved={() => { queryClient.invalidateQueries({ queryKey: ['admin-bookings'] }); setShowCreate(false); }}
         />
       )}
-    </div>
-  );
-}
-
-function EditBookingModal({ booking, onClose, onAction }: {
-  booking: Booking;
-  onClose: () => void;
-  onAction: () => void;
-}) {
-  const confirm = useMutation({ mutationFn: () => bookingsApi.confirm(booking.id), onSuccess: onAction });
-  const attend = useMutation({ mutationFn: () => bookingsApi.attend(booking.id), onSuccess: onAction });
-  const noShow = useMutation({ mutationFn: () => bookingsApi.markNoShow(booking.id), onSuccess: onAction });
-  const cancel = useMutation({ mutationFn: () => bookingsApi.cancel(booking.id), onSuccess: onAction });
-
-  const tz = booking.resource?.timezone || 'UTC';
-  const start = DateTime.fromISO(booking.startAt).setZone(tz);
-  const end = DateTime.fromISO(booking.endAt).setZone(tz);
-  const dateStr = start.setLocale('es').toFormat("cccc d 'de' MMMM yyyy");
-  const timeStr = `${start.toFormat('HH:mm')} – ${end.toFormat('HH:mm')}`;
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
-        <div className="modal-header">
-          <h2>Detalle de Reserva</h2>
-          <button className="modal-close" onClick={onClose}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="modal-body">
-          <div className="edit-booking-info">
-            <div className="edit-booking-row">
-              <span className="edit-booking-label">Cancha</span>
-              <span className="edit-booking-value">{booking.resource?.name}</span>
-            </div>
-            <div className="edit-booking-row">
-              <span className="edit-booking-label">Usuario</span>
-              <span className="edit-booking-value">{booking.user?.name ?? booking.userId}</span>
-            </div>
-            {booking.user?.email && (
-              <div className="edit-booking-row">
-                <span className="edit-booking-label">Email</span>
-                <span className="edit-booking-value">{booking.user.email}</span>
-              </div>
-            )}
-            <div className="edit-booking-row">
-              <span className="edit-booking-label">Fecha</span>
-              <span className="edit-booking-value">{dateStr}</span>
-            </div>
-            <div className="edit-booking-row">
-              <span className="edit-booking-label">Horario</span>
-              <span className="edit-booking-value">{timeStr}</span>
-            </div>
-            <div className="edit-booking-row">
-              <span className="edit-booking-label">Estado</span>
-              <span className={`admin-status-badge ${getStatusBadgeClass(booking.status)}`}>
-                <span className={`admin-status-dot ${getStatusDotClass(booking.status)}`} />
-                {STATUS_LABELS[booking.status] ?? booking.status}
-              </span>
-            </div>
-            {booking.refundPct != null && (
-              <div className="edit-booking-row">
-                <span className="edit-booking-label">Reembolso</span>
-                <span className="edit-booking-value">{booking.refundPct}%</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="modal-footer" style={{ flexWrap: 'wrap' }}>
-          {booking.status === 'PENDING' && (
-            <button className="admin-primary-btn" disabled={confirm.isPending} onClick={() => confirm.mutate()}>
-              {confirm.isPending ? 'Confirmando...' : 'Confirmar'}
-            </button>
-          )}
-          {booking.status === 'CONFIRMED' && (
-            <>
-              <button className="admin-primary-btn" disabled={attend.isPending} onClick={() => attend.mutate()}>
-                {attend.isPending ? 'Marcando...' : 'Marcar asistencia'}
-              </button>
-              <button className="admin-btn-outline-danger" disabled={noShow.isPending} onClick={() => noShow.mutate()}>
-                No show
-              </button>
-            </>
-          )}
-          {(booking.status === 'PENDING' || booking.status === 'CONFIRMED') && (
-            <button className="admin-btn-outline-danger" disabled={cancel.isPending} onClick={() => cancel.mutate()}>
-              {cancel.isPending ? 'Cancelando...' : 'Cancelar reserva'}
-            </button>
-          )}
-          <button className="admin-btn-secondary" onClick={onClose}>Cerrar</button>
-        </div>
-      </div>
     </div>
   );
 }

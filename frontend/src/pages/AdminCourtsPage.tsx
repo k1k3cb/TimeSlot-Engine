@@ -111,6 +111,7 @@ export function AdminCourtsPage() {
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -180,6 +181,67 @@ export function AdminCourtsPage() {
       ...prev,
       photos: prev.photos.filter((_, i) => i !== idx),
     }));
+  }
+
+  function handleDrag(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  }
+
+  async function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+    const remaining = 8 - form.photos.filter((p) => !p.isCover).length;
+    if (remaining <= 0) {
+      setError('Máximo 8 fotos de galería');
+      return;
+    }
+    setUploading(true);
+    setError(null);
+    try {
+      const toUpload = Array.from(files).slice(0, remaining);
+      const uploaded = await uploadFiles(toUpload);
+      setForm((prev) => ({
+        ...prev,
+        photos: [...prev.photos, ...uploaded],
+      }));
+    } catch (err) {
+      setError(extractError(err));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleCoverDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const uploaded = await uploadFiles([files[0]]);
+      setForm((prev) => ({
+        ...prev,
+        photos: [
+          { ...uploaded[0], isCover: true },
+          ...prev.photos.filter((p) => !p.isCover),
+        ],
+      }));
+    } catch (err) {
+      setError(extractError(err));
+    } finally {
+      setUploading(false);
+    }
   }
 
   function buildPayload(): CreateResourcePayload {
@@ -473,8 +535,12 @@ export function AdminCourtsPage() {
                 <div className="form-photo-main">
                   <label>Foto Principal (Portada)</label>
                   <div
-                    className="form-upload-box form-upload-cover"
+                    className={`form-upload-box form-upload-cover ${dragActive ? 'drag-active' : ''}`}
                     onClick={() => coverInputRef.current?.click()}
+                    onDragEnter={handleDrag}
+                    onDragOver={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDrop={handleCoverDrop}
                     style={{ cursor: 'pointer' }}
                   >
                     {coverPhoto ? (
@@ -514,8 +580,12 @@ export function AdminCourtsPage() {
                 <div className="form-photo-gallery">
                   <label>Fotos de Galería (Hasta 8 fotos)</label>
                   <div
-                    className="form-upload-zone"
+                    className={`form-upload-zone ${dragActive ? 'drag-active' : ''}`}
                     onClick={() => galleryInputRef.current?.click()}
+                    onDragEnter={handleDrag}
+                    onDragOver={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDrop={handleDrop}
                     style={{ cursor: 'pointer' }}
                   >
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-foreground)' }}>
