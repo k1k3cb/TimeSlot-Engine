@@ -1,6 +1,6 @@
 <div align="center">
 
-⭐ **If you like this project, please star the repository!** ⭐
+⭐ **Si te gusta este proyecto, ¡dale estrella al repositorio!** ⭐
 
 ---
 
@@ -23,7 +23,7 @@
 
 ---
 
-## 💡 Overview
+## 💡 Descripción General
 
 **TimeSlot Engine** es un sistema completo de gestión de reservas para canchas deportivas (pádel, tenis, fútbol 5). Permite a los usuarios registrarse, explorar canchas disponibles, reservar horarios y gestionar sus reservas en tiempo real. Los administradores pueden gestionar canchas, reservas, políticas de cancelación y usuarios desde un panel dedicado.
 
@@ -38,7 +38,7 @@
 
 ---
 
-## ✨ Features
+## ✨ Características
 
 - **🔐 Autenticación segura:** Registro, login y gestión de sesiones con JWT y Argon2.
 - **🏟️ Gestión de canchas:** CRUD completo con fotos, horarios y precios configurables.
@@ -53,7 +53,7 @@
 
 ---
 
-## 👩‍💻 Tech Stack
+## 👩‍💻 Stack Tecnológico
 
 ### Backend
 - **NestJS** - Framework Node.js modular y escalable
@@ -83,53 +83,53 @@
 
 ---
 
-## 📸 Screenshots
+## 📸 Capturas de Pantalla
 
-### Login Page
-![Login Page](./screenshots/login.png)
+### Página de Login
+![Página de Login](./screenshots/login.png)
 
-### Register Page
-![Register Page](./screenshots/register.png)
+### Página de Registro
+![Página de Registro](./screenshots/register.png)
 
-### Resources Page (Court Listing)
-![Resources Page](./screenshots/resources.png)
+### Página de Canchas (Listado)
+![Página de Canchas](./screenshots/resources.png)
 
-### Resource Detail (Booking)
-![Resource Detail](./screenshots/resource-detail.png)
+### Detalle de Cancha (Reserva)
+![Detalle de Cancha](./screenshots/resource-detail.png)
 
-### User Bookings
-![User Bookings](./screenshots/bookings.png)
+### Mis Reservas
+![Mis Reservas](./screenshots/bookings.png)
 
-### Admin Dashboard
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+### Panel de Administración
+![Panel de Administración](./screenshots/admin-dashboard.png)
 
-### Admin Courts Management
-![Admin Courts](./screenshots/admin-courts.png)
+### Gestión de Canchas (Admin)
+![Gestión de Canchas](./screenshots/admin-courts.png)
 
-### Admin Bookings Management
-![Admin Bookings](./screenshots/admin-bookings.png)
+### Gestión de Reservas (Admin)
+![Gestión de Reservas](./screenshots/admin-bookings.png)
 
 ---
 
-## 📦 Getting Started
+## 📦 Primeros Pasos
 
-### 🚀 Prerequisites
+### 🚀 Requisitos Previos
 
 - **Node.js** (v18.x o superior)
 - **pnpm** (v8.x o superior)
 - **PostgreSQL** (v14.x o superior)
 - **Docker** (opcional, para base de datos)
 
-### 🛠️ Installation
+### 🛠️ Instalación
 
-1. **Clone the repository:**
+1. **Clonar el repositorio:**
 
    ```bash
-   git clone https://github.com/your-username/timeslot-engine.git
+   git clone https://github.com/tu-usuario/timeslot-engine.git
    cd timeslot-engine
    ```
 
-2. **Setup Database (using Docker):**
+2. **Configurar la Base de Datos (usando Docker):**
 
    ```bash
    docker run -d \
@@ -141,20 +141,20 @@
      postgres:16-alpine
    ```
 
-3. **Setup Backend:**
+3. **Configurar el Backend:**
 
    ```bash
    cd backend
    pnpm install
    cp .env.example .env
-   # Edit .env with your database URL and JWT secrets
+   # Editar .env con tu URL de base de datos y secretos JWT
    pnpm run prisma:generate
    pnpm run prisma:migrate
    pnpm run seed
    pnpm run dev
    ```
 
-4. **Setup Frontend (in a new terminal):**
+4. **Configurar el Frontend (en una nueva terminal):**
 
    ```bash
    cd frontend
@@ -162,30 +162,30 @@
    pnpm run dev
    ```
 
-5. **Access the application:**
+5. **Acceder a la aplicación:**
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:3000/api
-   - API Documentation: http://localhost:3000/docs
-   - Scalar Reference: http://localhost:3000/reference
+   - Documentación API: http://localhost:3000/docs
+   - Referencia Scalar: http://localhost:3000/reference
 
-### 🎮 Demo Accounts
+### 🎮 Cuentas de Demostración
 
-After running the seed command, you can use these accounts:
+Después de ejecutar el comando de seed, puedes usar estas cuentas:
 
-| Role | Email | Password |
-|------|-------|----------|
+| Rol | Email | Contraseña |
+|-----|-------|------------|
 | Admin | admin@timeslot.dev | Admin#2026 |
-| Client | juan@timeslot.dev | Client#2026 |
-| Client | ana@timeslot.dev | Client#2026 |
-| Client | luis@timeslot.dev | Client#2026 |
+| Cliente | juan@timeslot.dev | Client#2026 |
+| Cliente | ana@timeslot.dev | Client#2026 |
+| Cliente | luis@timeslot.dev | Client#2026 |
 
 ---
 
-## 📖 Usage
+## 📖 Uso
 
-### Running the Application
+### Ejecutar la Aplicación
 
-**Development mode:**
+**Modo desarrollo:**
 ```bash
 # Backend
 cd backend && pnpm run dev
@@ -194,7 +194,7 @@ cd backend && pnpm run dev
 cd frontend && pnpm run dev
 ```
 
-**Production mode:**
+**Modo producción:**
 ```bash
 # Backend
 cd backend && pnpm run build && pnpm run start:prod
@@ -203,93 +203,93 @@ cd backend && pnpm run build && pnpm run start:prod
 cd frontend && pnpm run build && pnpm run preview
 ```
 
-### 📃 API Documentation
+### 📃 Documentación de la API
 
-The API documentation is available at:
+La documentación de la API está disponible en:
 - **Swagger UI:** http://localhost:3000/docs
-- **Scalar Reference:** http://localhost:3000/reference
+- **Referencia Scalar:** http://localhost:3000/reference
 
-### Key API Endpoints
+### Endpoints Principales de la API
 
-| Method | Endpoint | Description |
+| Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login (returns JWT pair) |
-| GET | `/api/resources` | List all courts |
-| GET | `/api/availability?resourceId=X&date=Y` | Get available slots |
-| POST | `/api/bookings` | Create a booking |
-| GET | `/api/bookings` | List user bookings |
-| PATCH | `/api/bookings/:id/cancel` | Cancel a booking |
+| POST | `/api/auth/register` | Registrar nuevo usuario |
+| POST | `/api/auth/login` | Iniciar sesión (retorna par JWT) |
+| GET | `/api/resources` | Listar todas las canchas |
+| GET | `/api/availability?resourceId=X&date=Y` | Obtener slots disponibles |
+| POST | `/api/bookings` | Crear una reserva |
+| GET | `/api/bookings` | Listar reservas del usuario |
+| PATCH | `/api/bookings/:id/cancel` | Cancelar una reserva |
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Arquitectura
 
-### Database Schema
+### Esquema de Base de Datos
 
-The application uses 7 main models:
+La aplicación utiliza 7 modelos principales:
 
-- **User** - Users with roles (ADMIN/CLIENT)
-- **Resource** - Courts/canchas with schedules and photos
-- **Booking** - Reservations with status tracking
-- **ResourceSchedule** - Weekly operating hours
-- **ResourcePhoto** - Court images
-- **CancellationPolicy** - Tiered cancellation rules
-- **RefreshToken** - JWT refresh token management
+- **User** - Usuarios con roles (ADMIN/CLIENT)
+- **Resource** - Canchas con horarios y fotos
+- **Booking** - Reservas con seguimiento de estado
+- **ResourceSchedule** - Horarios de operación semanales
+- **ResourcePhoto** - Imágenes de canchas
+- **CancellationPolicy** - Reglas de cancelación por niveles
+- **RefreshToken** - Gestión de tokens de refresco JWT
 
-### Key Technical Decisions
+### Decisiones Técnicas Clave
 
-1. **Overlap Prevention:** PostgreSQL EXCLUDE constraint with GiST index prevents race conditions
-2. **Timezone Handling:** Luxon converts between resource-local time and UTC
-3. **Cancellation Policies:** Strategy pattern with three implementations (Tiered, NoRefund, FreeUntilStart)
-4. **Real-time Events:** Socket.IO with room-based targeting (per-user and admin rooms)
-5. **Token Rotation:** Old refresh tokens are revoked on each refresh
-
----
-
-## 🤝 Contributing
-
-We welcome contributions to this project. Please follow these steps:
-
-1. **Fork the repository.**
-2. **Create a new branch** (`git checkout -b feature/your-feature-name`).
-3. **Make your changes** and commit them (`git commit -m 'Add some feature'`).
-4. **Push to the branch** (`git push origin feature/your-feature-name`).
-5. **Open a pull request.**
-
-Please make sure to update tests as appropriate.
-
-### Development Guidelines
-
-- Follow existing code style and conventions
-- Write tests for new features
-- Update documentation as needed
-- Use conventional commit messages
+1. **Prevención de Solapamientos:** Restricción EXCLUDE de PostgreSQL con índice GiST previene condiciones de carrera
+2. **Manejo de Zonas Horarias:** Luxon convierte entre hora local del recurso y UTC
+3. **Políticas de Cancelación:** Patrón Estrategia con tres implementaciones (Tiered, NoRefund, FreeUntilStart)
+4. **Eventos en Tiempo Real:** Socket.IO con dirigimiento por salas (por usuario y salas de admin)
+5. **Rotación de Tokens:** Los tokens de refresco antiguos se revocan en cada refresco
 
 ---
 
-## 🐛 Issues
+## 🤝 Contribuir
 
-If you encounter any issues, please check the [Issues](https://github.com/your-username/timeslot-engine/issues) section. When reporting an issue, please include:
+Damos la bienvenida a contribuciones a este proyecto. Por favor sigue estos pasos:
 
-- A clear and descriptive title
-- Steps to reproduce the issue
-- Expected vs actual behavior
-- Environment details (OS, browser, Node.js version)
-- Screenshots if applicable
+1. **Haz fork del repositorio.**
+2. **Crea una nueva rama** (`git checkout -b feature/tu-caracteristica`).
+3. **Haz tus cambios** y haz commit (`git commit -m 'Agregar alguna característica'`).
+4. **Push a la rama** (`git push origin feature/tu-caracteristica`).
+5. **Abre un pull request.**
+
+Por favor asegúrate de actualizar las pruebas según corresponda.
+
+### Guías de Desarrollo
+
+- Sigue el estilo de código y convenciones existentes
+- Escribe pruebas para nuevas características
+- Actualiza la documentación según sea necesario
+- Usa mensajes de commit convencionales
 
 ---
 
-## 📜 License
+## 🐛 Problemas
 
-Distributed under the MIT License. See [LICENSE](./LICENSE) for more information.
+Si encuentras algún problema, por favor revisa la sección de [Issues](https://github.com/tu-usuario/timeslot-engine/issues). Al reportar un problema, por favor incluye:
+
+- Un título claro y descriptivo
+- Pasos para reproducir el problema
+- Comportamiento esperado vs actual
+- Detalles del entorno (SO, navegador, versión de Node.js)
+- Capturas de pantalla si aplica
 
 ---
 
-## 🙏 Acknowledgements
+## 📜 Licencia
 
-- [NestJS](https://nestjs.com/) for the amazing backend framework
-- [Prisma](https://www.prisma.io/) for the modern ORM
-- [React](https://react.dev/) for the UI library
-- [Vite](https://vitejs.dev/) for the fast build tool
-- [Socket.IO](https://socket.io/) for real-time communication
+Distribuido bajo la Licencia MIT. Ver [LICENSE](./LICENSE) para más información.
+
+---
+
+## 🙏 Agradecimientos
+
+- [NestJS](https://nestjs.com/) por el increíble framework de backend
+- [Prisma](https://www.prisma.io/) por el ORM moderno
+- [React](https://react.dev/) por la biblioteca de UI
+- [Vite](https://vitejs.dev/) por la herramienta de construcción rápida
+- [Socket.IO](https://socket.io/) por la comunicación en tiempo real
