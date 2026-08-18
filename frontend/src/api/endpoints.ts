@@ -100,6 +100,8 @@ export const bookingsApi = {
 
 export const policiesApi = {
   defaults: () => api.get<{ rules: TieredRule[] }>('/policies/defaults').then((r) => r.data),
+  getResource: (resourceId: string) =>
+    api.get<{ rules: TieredRule[]; source: 'custom' | 'global' | 'default' }>(`/policies/resource/${resourceId}`).then((r) => r.data),
   setGlobal: (rules: TieredRule[]) =>
     api.post<CancellationPolicy>('/policies/global', { rules }).then((r) => r.data),
   setForResource: (resourceId: string, rules: TieredRule[]) =>

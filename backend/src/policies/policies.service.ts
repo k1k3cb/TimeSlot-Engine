@@ -77,4 +77,22 @@ export class PoliciesService {
   getDefaultRules(): TieredRule[] {
     return [...DEFAULT_RULES];
   }
+
+  async getRulesForResource(resourceId: string): Promise<{ rules: TieredRule[]; source: 'custom' | 'global' | 'default' }> {
+    const custom = await this.prisma.cancellationPolicy.findUnique({
+      where: { resourceId },
+    });
+    if (custom) {
+      return { rules: custom.rules as unknown as TieredRule[], source: 'custom' };
+    }
+
+    const fallback = await this.prisma.cancellationPolicy.findFirst({
+      where: { resourceId: null },
+    });
+    if (fallback) {
+      return { rules: fallback.rules as unknown as TieredRule[], source: 'global' };
+    }
+
+    return { rules: [...DEFAULT_RULES], source: 'default' };
+  }
 }

@@ -20,6 +20,16 @@ export class PoliciesController {
     return { rules: this.policies.getDefaultRules() };
   }
 
+  @Public()
+  @Get('resource/:resourceId')
+  @ApiOperation({ summary: 'Política de cancelación para un recurso', description: 'Devuelve las reglas de reembolso aplicables a un recurso específico (custom, global o default).' })
+  @ApiResponse({ status: 200, description: 'Reglas de política para el recurso' })
+  @ApiResponse({ status: 404, description: 'Recurso no encontrado', type: ErrorResponseDto })
+  async getResourcePolicy(@Param('resourceId', ParseCuidPipe) resourceId: string) {
+    const { rules, source } = await this.policies.getRulesForResource(resourceId);
+    return { rules, source };
+  }
+
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')

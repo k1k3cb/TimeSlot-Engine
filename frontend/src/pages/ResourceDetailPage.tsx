@@ -2,10 +2,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { DateTime } from 'luxon';
-import { availabilityApi, bookingsApi, resourcesApi } from '../api/endpoints';
+import { availabilityApi, bookingsApi, policiesApi, resourcesApi } from '../api/endpoints';
 import { ClientNav } from '../components/ClientNav';
-import type { Resource, Slot } from '../types/domain';
+import type { Resource, Slot, TieredRule } from '../types/domain';
 import { useBookingNotifications } from '../hooks/useBookingNotifications';
+
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') ?? 'http://localhost:3000';
+
+function formatPrice(value: number): string {
+  return `€${value.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 
 const AMENITIES = [
   {
@@ -154,6 +160,12 @@ export function ResourceDetailPage() {
     enabled: !!id,
   });
 
+  const policyQuery = useQuery({
+    queryKey: ['policy', id],
+    queryFn: () => policiesApi.getResource(id!),
+    enabled: !!id,
+  });
+
   const createBooking = useMutation({
     mutationFn: (slot: Slot) =>
       bookingsApi.create({
@@ -191,6 +203,8 @@ export function ResourceDetailPage() {
   const city = tz.split('/').pop()?.replace(/_/g, ' ') ?? tz;
   const sportType = getSportType(resource.name);
   const rating = (4.5 + Math.random() * 0.5).toFixed(1);
+  const coverPhoto = resource.photos?.find((p) => p.isCover);
+  const galleryPhotos = resource.photos?.filter((p) => !p.isCover) ?? [];
 
   return (
     <div className="client-page">
@@ -210,7 +224,15 @@ export function ResourceDetailPage() {
             <div className="detail-left">
               {/* Hero image */}
               <div className="detail-hero-image">
-                <CourtHeroImage type={sportType} />
+                {coverPhoto ? (
+                  <img
+                    src={`${API_BASE}${coverPhoto.url}`}
+                    alt={resource.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                ) : (
+                  <CourtHeroImage type={sportType} />
+                )}
                 <div className="detail-hero-badges">
                   <span className="detail-hero-badge detail-hero-badge-primary">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -224,14 +246,35 @@ export function ResourceDetailPage() {
 
               {/* Thumbnails */}
               <div className="detail-thumbs">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="detail-thumb">
-                    <CourtThumb type={sportType} idx={i} />
+                {galleryPhotos.length > 0 ? (
+                  galleryPhotos.slice(0, 3).map((p, i) => (
+                    <div key={i} className="detail-thumb">
+                      <img
+                        src={`${API_BASE}${p.url}`}
+                        alt={`Foto ${i + 1}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="detail-thumb">
+                        <CourtThumb type={sportType} idx={i} />
+                      </div>
+                    ))}
+                  </>
+                )}
+                {galleryPhotos.length > 3 && (
+                  <div className="detail-thumb detail-thumb-more">
+                    <span>+{galleryPhotos.length - 3} Fotos</span>
                   </div>
-                ))}
-                <div className="detail-thumb detail-thumb-more">
-                  <span>+5 Fotos</span>
-                </div>
+                )}
+                {galleryPhotos.length <= 3 && (
+                  <div className="detail-thumb detail-thumb-more">
+                    <span>+5 Fotos</span>
+                  </div>
+                )}
               </div>
 
               {/* Info */}
@@ -289,7 +332,7 @@ export function ResourceDetailPage() {
                   <div>
                     <span className="detail-price-label">Precio por turno</span>
                     <div className="detail-price-value">
-                      €12.000,00 <span className="detail-price-unit">/ {duration} min</span>
+                      {resource.pricePerHour > 0 ? formatPrice(resource.pricePerHour) : '—'} <span className="detail-price-unit">/ {duration} min</span>
                     </div>
                   </div>
                   <span className="detail-price-badge">Cancha Rápida</span>
@@ -433,7 +476,7 @@ export function ResourceDetailPage() {
                     </svg>
                   )}
                 </button>
-                <p className="detail-cta-note">Pago en el club. Cancelación gratuita hasta 12hs antes.</p>
+                <CancellationPolicy rules={policyQuery.data?.rules} isLoading={policyQuery.isLoading} />
 
                 {createBooking.isError && (
                   <p className="error" style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}>
@@ -448,6 +491,51 @@ export function ResourceDetailPage() {
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function CancellationPolicy({ rules, isLoading }: { rules?: TieredRule[]; isLoading: boolean }) {
+  if (isLoading) {
+    return (
+      <div className="detail-cancellation-policy">
+        <p className="muted" style={{ fontSize: '0.85rem', margin: 0 }}>Cargando política de cancelación...</p>
+      </div>
+    );
+  }
+
+  if (!rules || rules.length === 0) {
+    return (
+      <div className="detail-cancellation-policy">
+        <p className="muted" style={{ fontSize: '0.85rem', margin: 0 }}>Política de cancelación no disponible</p>
+      </div>
+    );
+  }
+
+  const sortedRules = [...rules].sort((a, b) => b.hoursBeforeStart - a.hoursBeforeStart);
+
+  return (
+    <div className="detail-cancellation-policy">
+      <div className="detail-cancellation-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        <span>Política de cancelación</span>
+      </div>
+      <div className="detail-cancellation-rules">
+        {sortedRules.map((rule, idx) => (
+          <div key={idx} className="detail-cancellation-rule">
+            <span className="detail-cancellation-condition">
+              {rule.hoursBeforeStart > 0 ? `≥ ${rule.hoursBeforeStart}h antes` : 'Último momento'}
+            </span>
+            <span className={`detail-cancellation-refund ${rule.refundPct >= 100 ? 'full' : rule.refundPct > 0 ? 'partial' : 'none'}`}>
+              {rule.refundPct === 100 ? 'Reembolso completo' : rule.refundPct > 0 ? `${rule.refundPct}% reembolso` : 'Sin reembolso'}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
