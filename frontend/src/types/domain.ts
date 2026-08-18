@@ -23,6 +23,13 @@ export interface ResourceSchedule {
   closeTime: string;
 }
 
+export interface ResourcePhoto {
+  id: string;
+  url: string;
+  isCover: boolean;
+  order: number;
+}
+
 export interface Resource {
   id: string;
   name: string;
@@ -30,7 +37,9 @@ export interface Resource {
   mode: BookingMode;
   capacity: number;
   timezone: string;
+  pricePerHour: number;
   isActive: boolean;
+  photos: ResourcePhoto[];
   schedules: ResourceSchedule[];
   createdAt: string;
   updatedAt: string;

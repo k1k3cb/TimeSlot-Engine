@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { resourcesApi, type CreateResourcePayload } from '../api/endpoints';
-import type { Resource, ResourceSchedule, BookingMode } from '../types/domain';
+import { resourcesApi, uploadsApi, type CreateResourcePayload, type PhotoInput } from '../api/endpoints';
+import type { Resource, ResourceSchedule, BookingMode, ResourcePhoto } from '../types/domain';
+
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') ?? 'http://localhost:3000';
 
 const TIMEZONES_BY_REGION: Record<string, string[]> = {
   'Europa': [
@@ -83,9 +85,11 @@ interface CourtForm {
   description: string;
   mode: BookingMode;
   capacity: number;
+  pricePerHour: number;
   timezone: string;
   isActive: boolean;
   schedules: ScheduleRow[];
+  photos: PhotoInput[];
 }
 
 const EMPTY_FORM: CourtForm = {
@@ -93,9 +97,11 @@ const EMPTY_FORM: CourtForm = {
   description: '',
   mode: 'EXCLUSIVE',
   capacity: 1,
+  pricePerHour: 0,
   timezone: 'Europe/Madrid',
   isActive: true,
   schedules: emptySchedule(),
+  photos: [],
 };
 
 export function AdminCourtsPage() {
@@ -104,11 +110,77 @@ export function AdminCourtsPage() {
   const [form, setForm] = useState<CourtForm>(EMPTY_FORM);
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-resources'],
     queryFn: () => resourcesApi.listAll(),
   });
+
+  async function uploadFiles(files: FileList | File[]): Promise<PhotoInput[]> {
+    const results: PhotoInput[] = [];
+    for (const file of Array.from(files)) {
+      const { url } = await uploadsApi.uploadPhoto(file);
+      results.push({ url });
+    }
+    return results;
+  }
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const uploaded = await uploadFiles(files);
+      setForm((prev) => ({
+        ...prev,
+        photos: [
+          { ...uploaded[0], isCover: true },
+          ...prev.photos.filter((p) => !p.isCover),
+        ],
+      }));
+    } catch (err) {
+      setError(extractError(err));
+    } finally {
+      setUploading(false);
+      if (coverInputRef.current) coverInputRef.current.value = '';
+    }
+  }
+
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const remaining = 8 - form.photos.filter((p) => !p.isCover).length;
+    if (remaining <= 0) {
+      setError('Máximo 8 fotos de galería');
+      return;
+    }
+    setUploading(true);
+    setError(null);
+    try {
+      const toUpload = Array.from(files).slice(0, remaining);
+      const uploaded = await uploadFiles(toUpload);
+      setForm((prev) => ({
+        ...prev,
+        photos: [...prev.photos, ...uploaded],
+      }));
+    } catch (err) {
+      setError(extractError(err));
+    } finally {
+      setUploading(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+    }
+  }
+
+  function removePhoto(idx: number) {
+    setForm((prev) => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== idx),
+    }));
+  }
 
   function buildPayload(): CreateResourcePayload {
     const schedules = toSchedules(form.schedules);
@@ -118,10 +190,12 @@ export function AdminCourtsPage() {
       mode: form.mode,
       capacity: form.capacity,
       timezone: form.timezone,
+      pricePerHour: form.pricePerHour,
       isActive: form.isActive,
       schedules,
     };
     if (form.description.trim()) payload.description = form.description.trim();
+    if (form.photos.length > 0) payload.photos = form.photos;
     return payload;
   }
 
@@ -154,9 +228,11 @@ export function AdminCourtsPage() {
       description: r.description ?? '',
       mode: r.mode,
       capacity: r.capacity,
+      pricePerHour: r.pricePerHour,
       timezone: r.timezone,
       isActive: r.isActive,
       schedules: fromSchedules(r.schedules),
+      photos: r.photos.map((p) => ({ url: p.url, isCover: p.isCover })),
     });
     setError(null);
     setShowForm(true);
@@ -219,6 +295,9 @@ export function AdminCourtsPage() {
 
   const saving = createMut.isPending || updateMut.isPending;
 
+  const coverPhoto = form.photos.find((p) => p.isCover);
+  const galleryPhotos = form.photos.filter((p) => !p.isCover);
+
   return (
     <div>
       {!showForm ? (
@@ -243,6 +322,7 @@ export function AdminCourtsPage() {
                   <th>Nombre</th>
                   <th>Modo</th>
                   <th>Cap.</th>
+                  <th>Precio/h</th>
                   <th>Zona Horaria</th>
                   <th>Estado</th>
                   <th style={{ textAlign: 'right' }}>Acciones</th>
@@ -251,14 +331,27 @@ export function AdminCourtsPage() {
               <tbody>
                 {data?.map((r) => {
                   const city = r.timezone.includes('/') ? r.timezone.split('/').pop()!.replace(/_/g, ' ') : r.timezone;
+                  const cover = r.photos?.find((p) => p.isCover);
                   return (
                     <tr key={r.id}>
                       <td>
-                        <div className="admin-court-name">{r.name}</div>
-                        {r.description && <div className="admin-court-desc">{r.description}</div>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          {cover && (
+                            <img
+                              src={`${API_BASE}${cover.url}`}
+                              alt=""
+                              style={{ width: 48, height: 36, objectFit: 'cover', borderRadius: 6 }}
+                            />
+                          )}
+                          <div>
+                            <div className="admin-court-name">{r.name}</div>
+                            {r.description && <div className="admin-court-desc">{r.description}</div>}
+                          </div>
+                        </div>
                       </td>
                       <td>{r.mode === 'EXCLUSIVE' ? 'Exclusivo' : 'Compartido'}</td>
                       <td style={{ textAlign: 'center' }}>{r.capacity}</td>
+                      <td>{r.pricePerHour > 0 ? `${r.pricePerHour.toFixed(2)}€` : '—'}</td>
                       <td>{city}</td>
                       <td>
                         <span className={`admin-status-pill ${r.isActive ? 'admin-status-active' : 'admin-status-inactive'}`}>
@@ -275,7 +368,7 @@ export function AdminCourtsPage() {
                   );
                 })}
                 {data && data.length === 0 && (
-                  <tr><td colSpan={6} className="muted" style={{ textAlign: 'center', padding: '2rem' }}>No hay canchas registradas.</td></tr>
+                  <tr><td colSpan={7} className="muted" style={{ textAlign: 'center', padding: '2rem' }}>No hay canchas registradas.</td></tr>
                 )}
               </tbody>
             </table>
@@ -316,6 +409,10 @@ export function AdminCourtsPage() {
                 <div className="form-field">
                   <label>Capacidad (personas)</label>
                   <input type="number" value={form.capacity} onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))} min={1} max={1000} />
+                </div>
+                <div className="form-field">
+                  <label>Precio por hora (€)</label>
+                  <input type="number" value={form.pricePerHour} onChange={(e) => setForm((f) => ({ ...f, pricePerHour: Number(e.target.value) }))} min={0} step={0.5} placeholder="0.00" />
                 </div>
                 <div className="form-field">
                   <label>Modo de reserva</label>
@@ -375,31 +472,93 @@ export function AdminCourtsPage() {
               <div className="form-photo-grid">
                 <div className="form-photo-main">
                   <label>Foto Principal (Portada)</label>
-                  <div className="form-upload-box form-upload-cover">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-foreground)', opacity: 0.5 }}>
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                      <circle cx="12" cy="13" r="4" />
-                    </svg>
-                    <span>Subir portada</span>
-                    <input type="file" accept="image/*" />
+                  <div
+                    className="form-upload-box form-upload-cover"
+                    onClick={() => coverInputRef.current?.click()}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {coverPhoto ? (
+                      <img
+                        src={`${API_BASE}${coverPhoto.url}`}
+                        alt="Portada"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }}
+                      />
+                    ) : (
+                      <>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-foreground)', opacity: 0.5 }}>
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                        <span>Subir portada</span>
+                      </>
+                    )}
+                    <input
+                      ref={coverInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      onChange={handleCoverUpload}
+                      style={{ display: 'none' }}
+                    />
                   </div>
+                  {coverPhoto && (
+                    <button
+                      type="button"
+                      className="form-slot-remove"
+                      onClick={() => removePhoto(form.photos.findIndex((p) => p.isCover))}
+                      style={{ marginTop: '0.5rem' }}
+                    >
+                      Quitar portada
+                    </button>
+                  )}
                 </div>
                 <div className="form-photo-gallery">
                   <label>Fotos de Galería (Hasta 8 fotos)</label>
-                  <div className="form-upload-zone">
+                  <div
+                    className="form-upload-zone"
+                    onClick={() => galleryInputRef.current?.click()}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-foreground)' }}>
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                       <circle cx="8.5" cy="8.5" r="1.5" />
                       <polyline points="21 15 16 10 5 21" />
                     </svg>
-                    <p className="form-upload-title">Arrastra tus fotos aquí o haz clic para buscar</p>
+                    <p className="form-upload-title">{uploading ? 'Subiendo...' : 'Arrastra tus fotos aquí o haz clic para buscar'}</p>
                     <p className="form-upload-sub">Selecciona varias imágenes para subirlas en lote.</p>
-                    <button type="button" className="form-upload-btn">Seleccionar archivos</button>
-                    <input type="file" accept="image/*" multiple />
+                    <button type="button" className="form-upload-btn" disabled={uploading}>Seleccionar archivos</button>
+                    <input
+                      ref={galleryInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      multiple
+                      onChange={handleGalleryUpload}
+                      style={{ display: 'none' }}
+                    />
                   </div>
                   <div className="form-upload-previews">
-                    {[0, 1, 2, 3].map((i) => (
-                      <div key={i} className="form-upload-thumb">
+                    {galleryPhotos.map((p, i) => (
+                      <div key={i} className="form-upload-thumb" style={{ position: 'relative' }}>
+                        <img
+                          src={`${API_BASE}${p.url}`}
+                          alt={`Foto ${i + 1}`}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(form.photos.indexOf(p))}
+                          style={{
+                            position: 'absolute', top: 2, right: 2,
+                            background: 'rgba(0,0,0,0.6)', color: '#fff', border: 'none',
+                            borderRadius: '50%', width: 20, height: 20, cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                    {Array.from({ length: Math.max(0, 4 - galleryPhotos.length) }).map((_, i) => (
+                      <div key={`empty-${i}`} className="form-upload-thumb">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-foreground)', opacity: 0.3 }}>
                           <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                           <circle cx="8.5" cy="8.5" r="1.5" />
@@ -482,8 +641,8 @@ export function AdminCourtsPage() {
 
             <div className="form-footer">
               <button onClick={closeForm} className="admin-btn-secondary">Cancelar</button>
-              <button className="admin-primary-btn" onClick={() => editing ? updateMut.mutate() : createMut.mutate()} disabled={saving}>
-                {saving ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear cancha'}
+              <button className="admin-primary-btn" onClick={() => editing ? updateMut.mutate() : createMut.mutate()} disabled={saving || uploading}>
+                {saving ? 'Guardando...' : uploading ? 'Subiendo fotos...' : editing ? 'Guardar cambios' : 'Crear cancha'}
               </button>
             </div>
           </div>

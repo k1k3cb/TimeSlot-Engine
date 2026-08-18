@@ -6,6 +6,8 @@ import { useBookingNotifications } from '../hooks/useBookingNotifications';
 import { ClientNav } from '../components/ClientNav';
 import type { BookingEvent, Resource } from '../types/domain';
 
+const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') ?? 'http://localhost:3000';
+
 const SPORT_FILTERS = ['Todas', 'Pádel', 'Tenis', 'Fútbol 5'] as const;
 
 function getSportType(name: string): 'padel' | 'tenis' | 'futbol' | 'default' {
@@ -136,6 +138,7 @@ function CourtCard({ court }: { court: Resource }) {
   const sportType = getSportType(court.name);
   const rating = (4.5 + Math.random() * 0.5).toFixed(1);
   const gradient = getSportGradient(sportType);
+  const coverPhoto = court.photos?.find((p) => p.isCover);
 
   const tags = court.description
     ? court.description.split(' ').filter((w) => w.length > 3).slice(0, 2)
@@ -143,14 +146,22 @@ function CourtCard({ court }: { court: Resource }) {
 
   return (
     <Link to={`/resources/${court.id}`} className="home-court-card" state={{ resource: court }}>
-      <div className="home-court-image" style={{ background: gradient }}>
-        <div className="home-court-image-placeholder">
-          <svg width="60" height="60" viewBox="0 0 64 64" fill="none" opacity="0.15">
-            <rect x="8" y="8" width="48" height="48" rx="4" stroke="#fff" strokeWidth="2" />
-            <line x1="32" y1="8" x2="32" y2="56" stroke="#fff" strokeWidth="1.5" />
-            <line x1="8" y1="32" x2="56" y2="32" stroke="#fff" strokeWidth="1.5" />
-          </svg>
-        </div>
+      <div className="home-court-image" style={{ background: coverPhoto ? undefined : gradient }}>
+        {coverPhoto ? (
+          <img
+            src={`${API_BASE}${coverPhoto.url}`}
+            alt={court.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div className="home-court-image-placeholder">
+            <svg width="60" height="60" viewBox="0 0 64 64" fill="none" opacity="0.15">
+              <rect x="8" y="8" width="48" height="48" rx="4" stroke="#fff" strokeWidth="2" />
+              <line x1="32" y1="8" x2="32" y2="56" stroke="#fff" strokeWidth="1.5" />
+              <line x1="8" y1="32" x2="56" y2="32" stroke="#fff" strokeWidth="1.5" />
+            </svg>
+          </div>
+        )}
         <span className="home-court-sport-badge">{getSportLabel(sportType)}</span>
         <span className="home-court-rating">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="none">
@@ -163,7 +174,9 @@ function CourtCard({ court }: { court: Resource }) {
       <div className="home-court-body">
         <div className="home-court-top">
           <h3>{court.name}</h3>
-          <span className="home-court-price">{formatPrice(4500)}<span>/h</span></span>
+          <span className="home-court-price">
+            {court.pricePerHour > 0 ? formatPrice(court.pricePerHour) : '—'}<span>/h</span>
+          </span>
         </div>
         <p className="home-court-location">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

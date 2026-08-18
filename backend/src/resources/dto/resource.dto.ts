@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsIn,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -30,6 +31,17 @@ export class ResourceScheduleDto {
   @ApiProperty({ example: '23:00', description: 'Hora de cierre (HH:mm)' })
   @Matches(/^([01]\d|2[0-3]):[0-5]\d$/, { message: 'closeTime must be HH:mm' })
   closeTime!: string;
+}
+
+export class ResourcePhotoDto {
+  @ApiProperty({ example: '/uploads/abc123.webp', description: 'URL de la foto' })
+  @IsString()
+  url!: string;
+
+  @ApiPropertyOptional({ example: true, default: false, description: 'Es la foto de portada' })
+  @IsOptional()
+  @IsBoolean()
+  isCover?: boolean;
 }
 
 export class CreateResourceDto {
@@ -65,12 +77,25 @@ export class CreateResourceDto {
   })
   timezone?: string;
 
+  @ApiPropertyOptional({ example: 25.0, minimum: 0, default: 0, description: 'Precio por hora en euros' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  pricePerHour?: number;
+
   @ApiProperty({ type: [ResourceScheduleDto], description: 'Horarios semanales del recurso' })
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ResourceScheduleDto)
   schedules!: ResourceScheduleDto[];
+
+  @ApiPropertyOptional({ type: [ResourcePhotoDto], description: 'Fotos de la cancha' })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ResourcePhotoDto)
+  photos?: ResourcePhotoDto[];
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()
@@ -94,6 +119,9 @@ export class UpdateResourceDto {
   @ApiPropertyOptional({ example: 'America/Mexico_City' })
   @IsOptional() @IsString() timezone?: string;
 
+  @ApiPropertyOptional({ example: 30.0, description: 'Precio por hora en euros' })
+  @IsOptional() @IsNumber() @Min(0) pricePerHour?: number;
+
   @ApiPropertyOptional()
   @IsOptional() @IsBoolean() isActive?: boolean;
 
@@ -103,6 +131,13 @@ export class UpdateResourceDto {
   @ValidateNested({ each: true })
   @Type(() => ResourceScheduleDto)
   schedules?: ResourceScheduleDto[];
+
+  @ApiPropertyOptional({ type: [ResourcePhotoDto], description: 'Fotos (reemplaza las existentes)' })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ResourcePhotoDto)
+  photos?: ResourcePhotoDto[];
 }
 
 export class ListResourcesQueryDto {
@@ -114,6 +149,20 @@ export class ListResourcesQueryDto {
 
   @ApiPropertyOptional({ default: true, description: 'Solo recursos activos' })
   @IsOptional() @IsBoolean() onlyActive?: boolean;
+}
+
+export class ResourcePhotoResponseDto {
+  @ApiProperty({ example: 'cm123abc' })
+  id!: string;
+
+  @ApiProperty({ example: '/uploads/abc123.webp' })
+  url!: string;
+
+  @ApiProperty({ example: true })
+  isCover!: boolean;
+
+  @ApiProperty({ example: 0 })
+  order!: number;
 }
 
 export class ResourceResponseDto {
@@ -135,8 +184,14 @@ export class ResourceResponseDto {
   @ApiProperty({ example: 'America/Mexico_City' })
   timezone!: string;
 
+  @ApiProperty({ example: 25.0, description: 'Precio por hora en euros' })
+  pricePerHour!: number;
+
   @ApiProperty({ example: true })
   isActive!: boolean;
+
+  @ApiProperty({ type: [ResourcePhotoResponseDto] })
+  photos!: ResourcePhotoResponseDto[];
 
   @ApiProperty({ type: [ResourceScheduleDto] })
   schedules!: ResourceScheduleDto[];

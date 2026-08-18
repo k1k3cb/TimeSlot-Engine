@@ -3,13 +3,17 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: false,
   });
+
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
   const config = app.get(ConfigService);
   const port = config.get<number>('port', 3000);
@@ -58,6 +62,7 @@ async function bootstrap() {
     .addTag('availability', 'Motor de slots disponibles')
     .addTag('bookings', 'Reservas de canchas')
     .addTag('policies', 'Políticas de cancelación')
+    .addTag('uploads', 'Subida de archivos')
     .build();
 
   const doc = SwaggerModule.createDocument(app, swaggerConfig);

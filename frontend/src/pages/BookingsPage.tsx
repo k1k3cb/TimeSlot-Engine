@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
+import { Link } from 'react-router-dom';
 import { bookingsApi } from '../api/endpoints';
 import { ClientNav } from '../components/ClientNav';
 
@@ -78,7 +79,16 @@ export function BookingsPage() {
 
       <main className="client-main">
         <div className="client-content">
-          <h1>Mis reservas</h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem' }}>
+            <h1>Mis reservas</h1>
+            <Link to="/" className="admin-primary-btn" style={{ textDecoration: 'none' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Nueva Reserva
+            </Link>
+          </div>
           <p className="muted" style={{ margin: '0 0 2rem', fontSize: '0.95rem' }}>
             Gestiona tus turnos activos e historial de partidos.
           </p>

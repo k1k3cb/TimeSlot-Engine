@@ -12,6 +12,7 @@ import { AvailabilityModule } from './availability/availability.module';
 import { PoliciesModule } from './policies/policies.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PoliciesModule,
     NotificationsModule,
     BookingsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

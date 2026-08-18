@@ -3068,29 +3068,29 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   flex-wrap: wrap;
 }
 
-.admin-filter-btn {
-  background: var(--card);
-  color: var(--muted-foreground);
-  border: 1px solid var(--border);
-  padding: 0.4rem 0.9rem;
-  border-radius: 9999px;
-  font-size: 0.8rem;
-  font-weight: 600;
+button.admin-filter-btn {
+  background: var(--card) !important;
+  color: var(--muted-foreground) !important;
+  border: 1px solid var(--border) !important;
+  padding: 0.4rem 0.9rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: var(--font-sans);
 }
 
-.admin-filter-btn:hover {
-  border-color: var(--muted-foreground);
-  color: var(--foreground);
+button.admin-filter-btn:hover {
+  border-color: var(--muted-foreground) !important;
+  color: var(--foreground) !important;
 }
 
-.admin-filter-btn.active {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border-color: var(--primary);
-  box-shadow: 0 2px 8px rgba(40,108,0,0.15);
+button.admin-filter-btn.active {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 2px 8px rgba(40,108,0,0.15) !important;
 }
 
 /* ── Admin page label ── */

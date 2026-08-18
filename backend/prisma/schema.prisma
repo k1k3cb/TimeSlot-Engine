@@ -55,20 +55,33 @@ model RefreshToken {
 }
 
 model Resource {
-  id          String              @id @default(cuid())
-  name        String
-  description String?
-  mode        BookingMode         @default(EXCLUSIVE)
-  capacity    Int                 @default(1)
-  timezone    String              @default("UTC")
-  isActive    Boolean             @default(true)
-  schedules   ResourceSchedule[]
-  bookings    Booking[]
-  policy      CancellationPolicy?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  id           String              @id @default(cuid())
+  name         String
+  description  String?
+  mode         BookingMode         @default(EXCLUSIVE)
+  capacity     Int                 @default(1)
+  timezone     String              @default("UTC")
+  pricePerHour Float               @default(0)
+  isActive     Boolean             @default(true)
+  photos       ResourcePhoto[]
+  schedules    ResourceSchedule[]
+  bookings     Booking[]
+  policy       CancellationPolicy?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 
   @@index([isActive])
+}
+
+model ResourcePhoto {
+  id         String   @id @default(cuid())
+  resourceId String
+  url        String
+  isCover    Boolean  @default(false)
+  order      Int      @default(0)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@index([resourceId, isCover])
 }
 
 model ResourceSchedule {

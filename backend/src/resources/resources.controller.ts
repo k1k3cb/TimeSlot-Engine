@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from '../common/decorators/auth.decorators';
+import { Public, Roles } from '../common/decorators/auth.decorators';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
@@ -30,6 +30,7 @@ import { ErrorResponseDto } from '../common/dto/response.dto';
 export class ResourcesController {
   constructor(private readonly resources: ResourcesService) {}
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Listar canchas disponibles' })
   @ApiResponse({ status: 200, description: 'Lista de recursos', type: [ResourceResponseDto] })
@@ -37,6 +38,7 @@ export class ResourcesController {
     return this.resources.list(q.onlyActive !== false);
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Detalle de una cancha' })
   @ApiResponse({ status: 200, description: 'Recurso encontrado', type: ResourceResponseDto })

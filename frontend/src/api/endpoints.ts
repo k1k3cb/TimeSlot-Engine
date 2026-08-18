@@ -19,14 +19,21 @@ export const authApi = {
   me: () => api.get('/auth/me').then((r) => r.data),
 };
 
+export interface PhotoInput {
+  url: string;
+  isCover?: boolean;
+}
+
 export interface CreateResourcePayload {
   name: string;
   description?: string;
   mode?: 'EXCLUSIVE' | 'SHARED';
   capacity?: number;
   timezone?: string;
+  pricePerHour?: number;
   isActive?: boolean;
   schedules: { dayOfWeek: number; openTime: string; closeTime: string }[];
+  photos?: PhotoInput[];
 }
 
 export interface UpdateResourcePayload {
@@ -35,9 +42,21 @@ export interface UpdateResourcePayload {
   mode?: 'EXCLUSIVE' | 'SHARED';
   capacity?: number;
   timezone?: string;
+  pricePerHour?: number;
   isActive?: boolean;
   schedules?: { dayOfWeek: number; openTime: string; closeTime: string }[];
+  photos?: PhotoInput[];
 }
+
+export const uploadsApi = {
+  uploadPhoto: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post<{ url: string }>('/uploads/resource-photo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data);
+  },
+};
 
 export const resourcesApi = {
   list: (params?: { onlyActive?: boolean }) =>
