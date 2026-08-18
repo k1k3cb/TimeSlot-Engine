@@ -89,7 +89,7 @@ export function ResourceDetailPage() {
   const initialResource = (location.state as { resource?: Resource } | null)?.resource;
   const [selectedDateIdx, setSelectedDateIdx] = useState(0);
   const [customDate, setCustomDate] = useState<string | null>(null);
-  const [duration, setDuration] = useState(90);
+  const [duration, setDuration] = useState(60);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);

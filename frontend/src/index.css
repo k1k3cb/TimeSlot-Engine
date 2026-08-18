@@ -248,7 +248,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .home-hero-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #0c4a6e 0%, #075985 40%, #0369a1 70%, #0ea5e9 100%);
+  background: url('/background_hero.jpg') center/cover no-repeat;
+}
+
+.home-hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
 }
 
 .home-hero-overlay {
